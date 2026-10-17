@@ -444,7 +444,61 @@
     </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Shin Bút Chì</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #fce4ec;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Chỗ chứa nền game */
+        .game-board {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            margin: 20px auto;
+            background: #fff;
+            border: 3px solid #ff4081;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
+        /* Chỉnh kích thước & vị trí nhân vật */
+        .character-shin {
+            position: absolute;
+            bottom: 30px;
+            left: 100px;
+            width: 150px; /* Chỉnh độ to nhỏ của Shin */
+            height: auto;
+        }
+
+        .character-ban-shin {
+            position: absolute;
+            bottom: 30px;
+            left: 300px;
+            width: 130px; /* Chỉnh độ to nhỏ của bạn Shin */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TIỆC SHIN XÌ HƠI</h1>
+
+    <div class="game-board">
+        <!-- ĐÂY LÀ ĐOẠN GỌI ĐÚNG FILE ẢNH CỦA MIU -->
+        <img class="character-shin" src="./shin.png" alt="Shin">
+        <img class="character-ban-shin" src="./ban shin.png" alt="Bạn Shin">
+    </div>
+
+</body>
+</html>
     <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LINH THÚ 3D ⭐</div>
 
     <!-- Sân khấu Quỹ đạo Elip -->
