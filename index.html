@@ -1,243 +1,830 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ĐẠI TIỆC SHIN XÌ HƠI! - PAJAMA PARTY</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap');
-  * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thẻ Đặc Quyền - Linh Thú 3D Vũ Trụ</title>
+    <!-- Pháo hoa Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  body {
-    background: #1e1e24;
-    font-family: 'Comfortaa', cursive, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+        body {
+            font-family: 'Mali', cursive, sans-serif;
+            background: radial-gradient(circle at center, #2b134d 0%, #0a0515 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 15px;
+            overflow-x: hidden;
+            color: #fff;
+        }
 
-  #game-app {
-    width: 1024px;
-    height: 576px;
-    background: #d8f5d3 url('assets/bg_classroom.png') no-repeat center/cover;
-    border: 8px solid #4a3427;
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-  }
+        /* Banner tiêu đề phong cách Cute Magic */
+        .title-banner {
+            background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%);
+            color: #fff;
+            padding: 10px 45px;
+            border-radius: 50px;
+            font-size: 2.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 0 25px rgba(255, 8, 68, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2);
+            border: 4px solid #fff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            animation: bannerFloat 3s ease-in-out infinite alternate;
+        }
 
-  /* Header */
-  .header-bar {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 70px;
-    background: rgba(255, 255, 255, 0.95);
-    border-bottom: 4px solid #ffccd5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 50;
-  }
+        @keyframes bannerFloat {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
 
-  .status-banner {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff8bd;
-    border: 2px solid #f4a261;
-    border-radius: 30px;
-    padding: 6px 30px;
-    font-size: 13px;
-    font-weight: bold;
-    color: #4a2800;
-    z-index: 40;
-  }
+        /* Sân khấu 3D lơ lửng trên không trung */
+        .arena-container {
+            position: relative;
+            width: 100vw;
+            max-width: 1350px;
+            height: 560px;
+            perspective: 1600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-  .stage {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 10;
-  }
+        /* Thẻ bao ngoài */
+        .card-wrapper {
+            position: absolute;
+            width: 180px;
+            height: 245px;
+            perspective: 1200px;
+            cursor: pointer;
+            transition: opacity 0.5s ease, filter 0.3s;
+            will-change: transform;
+        }
 
-  /* Shin */
-  .shin-box {
-    position: absolute;
-    bottom: 120px;
-    left: 620px;
-    width: 130px;
-    height: 140px;
-    z-index: 25;
-    cursor: pointer;
-    text-align: center;
-  }
-  .shin-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .shin-tag {
-    background: #ffeb3b;
-    border: 2px solid #5d4037;
-    border-radius: 10px;
-    padding: 2px 10px;
-    font-size: 11px;
-    font-weight: bold;
-    display: inline-block;
-  }
+        /* Khối lật 3D (Flip Card) */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
 
-  /* Học sinh */
-  .student-box {
-    position: absolute;
-    width: 85px;
-    height: 110px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    transition: left 0.8s ease, bottom 0.8s ease;
-    z-index: 20;
-  }
-  .student-img {
-    width: 65px;
-    height: 80px;
-    object-fit: contain;
-  }
-  .student-box.fainted .student-img {
-    transform: rotate(85deg);
-    filter: drop-shadow(0 0 6px rgba(118, 186, 0, 0.6));
-  }
-  .student-name {
-    background: #fff;
-    border: 2px solid #4a3427;
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: bold;
-    margin-top: 3px;
-    white-space: nowrap;
-  }
-  .student-box.fainted .student-name {
-    background: #ffd6d6;
-    color: #c9184a;
-    border-color: #c9184a;
-  }
+        .card-wrapper.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
 
-  /* Footer */
-  .footer-bar {
-    position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 75px;
-    background: #fff;
-    border-top: 4px solid #ffccd5;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 50;
-  }
-  .btn-fart {
-    background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
-    color: white;
-    border: none;
-    padding: 12px 36px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 25px;
-    cursor: pointer;
-  }
-</style>
+        /* Mặt thẻ */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 12px;
+            border: 3px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 20px rgba(255, 117, 140, 0.5), 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Mặt úp: Linh thú 3D hoạt hình sống động */
+        .card-back {
+            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 50%, #7afcff 100%);
+            animation: auraPulse 2.5s infinite alternate ease-in-out;
+            overflow: hidden;
+        }
+
+        @keyframes auraPulse {
+            0% { box-shadow: 0 0 15px rgba(255, 117, 140, 0.6), 0 0 30px rgba(255, 126, 179, 0.4); }
+            100% { box-shadow: 0 0 30px rgba(255, 75, 43, 0.9), 0 0 55px rgba(255, 140, 0, 0.7); }
+        }
+
+        /* Khung chứa ảnh linh thú 3D */
+        .animal-avatar-container {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        /* Vòng hào quang thiên thần xoay quanh linh thú */
+        .animal-halo {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            animation: rotateHalo 6s linear infinite;
+        }
+
+        @keyframes rotateHalo {
+            0% { transform: rotate(0deg) scale(0.95); }
+            50% { transform: rotate(180deg) scale(1.08); }
+            100% { transform: rotate(360deg) scale(0.95); }
+        }
+
+        /* Ảnh con vật 3D */
+        .animal-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.35));
+            animation: animalFloat 2.6s ease-in-out infinite alternate;
+            z-index: 2;
+        }
+
+        @keyframes animalFloat {
+            0% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(3deg) scale(1.05); }
+            100% { transform: translateY(4px) rotate(-3deg) scale(0.98); }
+        }
+
+        .animal-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffe600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+        }
+
+        .card-label {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #d63384;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5px 16px;
+            border-radius: 30px;
+            border: 2px dashed #d63384;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Mặt ngửa (Lộ phần thưởng) */
+        .card-front {
+            background: linear-gradient(145deg, #ffffff 0%, #fff0f5 100%);
+            color: #333;
+            transform: rotateY(180deg);
+            padding: 20px 15px;
+            text-align: center;
+            border: 4px solid #ff477e;
+            box-shadow: 0 0 35px #ffe600, 0 0 60px #ff7b00;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .card-front .reward-icon {
+            font-size: 4.2rem;
+            animation: bounceIcon 1s infinite alternate;
+        }
+
+        @keyframes bounceIcon {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+
+        .card-front .reward-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #d63384;
+            line-height: 1.35;
+        }
+
+        /* Hiệu ứng khóa mục tiêu ngẫu nhiên */
+        .card-wrapper.targeted {
+            filter: brightness(1.35);
+            box-shadow: 0 0 45px #00f2fe, 0 0 80px #4facfe !important;
+            z-index: 400 !important;
+        }
+
+        /* Thẻ được chọn phóng to ra giữa màn hình */
+        .card-wrapper.focus-center {
+            z-index: 500 !important;
+            transform: translate(0px, 0px) scale(1.48) !important;
+            transition: transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+        }
+
+        /* Thẻ bị loại trừ */
+        .card-wrapper.eliminated {
+            transform: scale(0) rotate(180deg) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: transform 0.5s ease, opacity 0.5s ease !important;
+        }
+
+        /* Nút điều khiển */
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-family: inherit;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.85);
+            color: #333;
+        }
+
+        .btn-config {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Modal Quà Nhận Được */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.78);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 90%;
+            max-width: 480px;
+            border-radius: 35px;
+            border: 8px solid #ff477e;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 50px rgba(255, 71, 126, 0.6);
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popUp {
+            from { transform: scale(0.6); }
+            to { transform: scale(1); }
+        }
+
+        .modal-header-tag {
+            background: #ffe066;
+            color: #d63384;
+            padding: 8px 25px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border: 3px solid #ff922b;
+        }
+
+        .modal-emoji {
+            font-size: 5.5rem;
+            margin: 10px 0;
+            animation: bounceEmoji 1.5s infinite ease-in-out;
+        }
+
+        @keyframes bounceEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .modal-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2b2d42;
+            margin: 20px 0 30px 0;
+            line-height: 1.4;
+        }
+
+        .btn-claim {
+            background: #51cf66;
+            color: white;
+            border: none;
+            font-family: inherit;
+            font-size: 1.35rem;
+            font-weight: 700;
+            padding: 12px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(81, 207, 102, 0.5);
+            transition: all 0.2s;
+        }
+
+        .btn-claim:hover {
+            transform: scale(1.06);
+            background: #40c057;
+        }
+
+        /* Modal Cài Đặt */
+        .config-modal-card {
+            background: #251d38;
+            color: #fff;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 25px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            border: 3px solid #7952b3;
+        }
+
+        .config-header {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ffb199;
+        }
+
+        .config-list {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .config-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255,255,255,0.06);
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .config-item input.icon-input {
+            width: 55px;
+            text-align: center;
+            font-size: 1.4rem;
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #191424;
+            color: #fff;
+        }
+
+        .config-item input.text-input {
+            flex: 1;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #191424;
+            color: #fff;
+        }
+
+        .config-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    </style>
 </head>
 <body>
 
-<div id="game-app">
-  <div class="header-bar">
-    <div style="font-size: 20px; font-weight: bold; color: #e63946;">💨 ĐẠI TIỆC SHIN XÌ HƠI!</div>
-    <div>ĐANG CHƠI: <b id="count-active">10</b> | ĐÃ XỈU: <b id="count-fainted">0</b></div>
-  </div>
+    <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LINH THÚ 3D ⭐</div>
 
-  <div class="status-banner" id="banner">🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!</div>
+    <!-- Sân khấu Quỹ đạo Elip -->
+    <div class="arena-container" id="arena"></div>
 
-  <div class="stage" id="stage">
-    <!-- Nhân vật Shin -->
-    <div class="shin-box" onclick="triggerFart()">
-      <img id="shin-sprite" class="shin-img" src="assets/shin_stand.png" alt="Shin">
-      <div class="shin-tag">SHIN 🍮</div>
+    <!-- Nút điều khiển -->
+    <div class="controls">
+        <button class="btn btn-start" id="startBtn" onclick="startShuffleAndAutoPick()">
+            🚀 Bắt Đầu Quay & Chọn Thẻ
+        </button>
+        <button class="btn btn-reset" onclick="resetGame()">
+            🔄 Đặt Lại Trò Chơi
+        </button>
+        <button class="btn btn-config" onclick="openConfigModal()">
+            ⚙️ Cài Đặt Quà
+        </button>
     </div>
-  </div>
 
-  <div class="footer-bar">
-    <div>
-      <span>SỐ BẠN NGẤT: </span>
-      <input type="range" id="faint-range" min="1" max="5" value="3" oninput="document.getElementById('range-val').innerText = this.value">
-      <b id="range-val" style="color: #c9184a;">3</b>
+    <!-- Modal Chi Tiết Quà -->
+    <div class="modal" id="rewardModal">
+        <div class="modal-card">
+            <div class="modal-header-tag">✨ ĐẶC QUYỀN CỦA EM ✨</div>
+            <div class="modal-emoji" id="rewardEmoji">👑</div>
+            <div class="modal-text" id="rewardText">Được làm lớp trưởng 1 tuần</div>
+            <button class="btn-claim" onclick="closeReward()">Nhận Thưởng 🎉</button>
+        </div>
     </div>
-    <button class="btn-fart" onclick="triggerFart()">💨 SHIN XÌ HƠI!</button>
-    <button onclick="resetStage()" style="padding: 6px 14px; border-radius: 8px;">🔄 Gọi lại</button>
-  </div>
-</div>
 
-<script>
-  const studentNames = ["Hoàng Minh Châu", "Tạ Gia Hân", "Phan Đức Phúc", "Trịnh Thùy Linh", "Vũ Hoàng Long", "Phạm Tiến Đạt", "Hồng Hứa Thy", "Hoàng Nam", "Phương Vy", "Ngọc Diệp"];
-  const stage = document.getElementById('stage');
-  let students = [];
+    <!-- Modal Chỉnh Sửa Quà -->
+    <div class="modal" id="configModal">
+        <div class="config-modal-card">
+            <div class="config-header">⚙️ Danh Sách Đặc Quyền Của Lớp</div>
+            <div class="config-list" id="configList"></div>
+            <div class="config-footer">
+                <button class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
+                <button class="btn btn-claim" onclick="saveConfig()">Lưu Lại</button>
+            </div>
+        </div>
+    </div>
 
-  function initStudents() {
-    document.querySelectorAll('.student-box').forEach(e => e.remove());
-    students = [];
+    <script>
+        // Danh sách 8 Bé Thú 3D Cute Fluent 3D
+        const animalList = [
+            { name: "Gấu Trúc 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Panda.png" },
+            { name: "Mèo Thần Tài 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Cat%20Face.png" },
+            { name: "Kỳ Lân Mộng Mơ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Unicorn.png" },
+            { name: "Rồng Con May Mắn", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dragon%20Face.png" },
+            { name: "Khủng Long Tí Nị", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sauropod.png" },
+            { name: "Cún Corgi Vui Vẻ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dog%20Face.png" },
+            { name: "Thỏ Bảy Màu 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Rabbit%20Face.png" },
+            { name: "Chim Cánh Cụt Cute", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Penguin.png" }
+        ];
 
-    studentNames.forEach((name, i) => {
-      const box = document.createElement('div');
-      box.className = 'student-box running';
-      box.innerHTML = `
-        <img class="student-img" src="assets/student_${i % 4}.png" alt="${name}">
-        <div class="student-name">${name}</div>
-      `;
+        const defaultRewards = [
+            { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
+            { text: "Miễn 1 lần kiểm tra bài cũ / bài tập!", icon: "📜" },
+            { text: "Được đổi chỗ ngồi theo ý thích 3 ngày!", icon: "🪑" },
+            { text: "Nhận 1 phần quà bí mật từ Thầy/Cô!", icon: "🎁" },
+            { text: "Được cộng 1 điểm vào bài thi tới!", icon: "💯" },
+            { text: "Được yêu cầu một bạn bất kỳ hát 1 bài!", icon: "🎤" },
+            { text: "Làm Quản Trò giờ giải lao buổi hôm nay!", icon: "🎮" },
+            { text: "Được miễn trực nhật lớp 1 buổi!", icon: "🧹" }
+        ];
 
-      let x = Math.random() * 500 + 40;
-      let y = Math.random() * 150 + 100;
-      box.style.left = x + 'px';
-      box.style.bottom = y + 'px';
+        let rewards = JSON.parse(localStorage.getItem('classroom_rewards')) || defaultRewards;
+        let eliminatedCards = new Set();
+        let currentChosenIndex = null;
+        let isAnimating = false;
+        let currentBaseAngle = 0;
 
-      stage.appendChild(box);
-      students.push(box);
-    });
-    updateCounts();
-  }
+        const arena = document.getElementById('arena');
+        const startBtn = document.getElementById('startBtn');
 
-  function triggerFart() {
-    const shinImg = document.getElementById('shin-sprite');
-    shinImg.src = 'assets/shin_fart.gif'; // Đổi sang ảnh động chổng mông thả rắm
+        // Âm thanh sống động
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    document.getElementById('banner').innerText = '🏃‍♂️ CHẠY MAU! CÁC BẠN ĐANG CHẠY TRỐN KHẮP PHÒNG!';
+        function playWhooshSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
+        }
 
-    const activeList = students.filter(s => s.classList.contains('running'));
-    if (!activeList.length) return alert('Tất cả đã xỉu rồi!');
+        function playFlipSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(420, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1050, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
 
-    const count = parseInt(document.getElementById('faint-range').value);
-    const chosen = activeList.sort(() => 0.5 - Math.random()).slice(0, count);
+        function playVictorySound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const notes = [261.6, 329.6, 392.0, 523.3, 659.3];
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.1);
+                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.5);
+            });
+        }
 
-    chosen.forEach(s => {
-      s.classList.remove('running');
-      s.classList.add('fainted');
-      s.querySelector('.student-img').src = 'assets/student_faint.png'; // Ảnh ngất mắt thôi miên
-    });
+        // Bán kính Elip
+        function getEllipseRadii() {
+            const maxArenaWidth = Math.min(window.innerWidth - 60, 1300);
+            return {
+                rx: Math.max(maxArenaWidth * 0.44, 450),
+                ry: 180
+            };
+        }
 
-    updateCounts();
-  }
+        // Cập nhật vị trí thẻ lơ lửng trên không trung elip
+        function updateCardsOnEllipse(baseAngle) {
+            const { rx, ry } = getEllipseRadii();
+            const activeIndices = [];
+            rewards.forEach((_, idx) => {
+                if (!eliminatedCards.has(idx) && idx !== currentChosenIndex) {
+                    activeIndices.push(idx);
+                }
+            });
 
-  function updateCounts() {
-    document.getElementById('count-active').innerText = students.filter(s => s.classList.contains('running')).length;
-    document.getElementById('count-fainted').innerText = students.filter(s => s.classList.contains('fainted')).length;
-  }
+            activeIndices.forEach((cardIdx, i) => {
+                const el = document.getElementById(`card-wrap-${cardIdx}`);
+                if (!el) return;
 
-  function resetStage() {
-    document.getElementById('shin-sprite').src = 'assets/shin_stand.png';
-    document.getElementById('banner').innerText = '🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!';
-    initStudents();
-  }
+                const angle = baseAngle + (i / activeIndices.length) * Math.PI * 2;
+                const cosA = Math.cos(angle);
+                const sinA = Math.sin(angle);
 
-  window.onload = initStudents;
-</script>
+                const x = cosA * rx;
+                const y = sinA * ry;
+
+                const depthFactor = (sinA + 1) / 2;
+                const scale = 0.72 + depthFactor * 0.38;
+                const zIndex = Math.round(50 + depthFactor * 100);
+                const tiltAngle = -cosA * 12;
+
+                el.style.zIndex = zIndex;
+                el.style.opacity = 0.55 + depthFactor * 0.45;
+                el.style.transform = `translate(${x}px, ${y}px) rotate(${tiltAngle}deg) scale(${scale})`;
+            });
+        }
+
+        // Khởi tạo thẻ với linh thú 3D hoạt hình
+        function initCards() {
+            arena.innerHTML = '';
+            rewards.forEach((item, index) => {
+                const animal = animalList[index % animalList.length];
+                const wrapper = document.createElement('div');
+                wrapper.className = 'card-wrapper';
+                wrapper.id = `card-wrap-${index}`;
+
+                wrapper.innerHTML = `
+                    <div class="card-inner">
+                        <!-- Mặt sau: Bé thú 3D Animation -->
+                        <div class="card-face card-back">
+                            <div class="animal-avatar-container">
+                                <div class="animal-halo"></div>
+                                <img src="${animal.img}" alt="${animal.name}" class="animal-img" loading="lazy">
+                            </div>
+                            <div class="animal-name">${animal.name}</div>
+                            <div class="card-label">Thẻ số ${index + 1}</div>
+                        </div>
+
+                        <!-- Mặt trước: Quà tặng Flip 3D -->
+                        <div class="card-face card-front">
+                            <div class="reward-icon">${item.icon}</div>
+                            <div class="reward-title">${item.text}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Vẫn hỗ trợ click tay chọn thẻ tức thì
+                wrapper.onclick = () => {
+                    if (!isAnimating && !eliminatedCards.has(index)) {
+                        pickAndRevealCard(index);
+                    }
+                };
+
+                arena.appendChild(wrapper);
+            });
+
+            updateCardsOnEllipse(currentBaseAngle);
+        }
+
+        // ================= QUAY SHUFFLE & TỰ ĐỘNG CHỌN =================
+        function startShuffleAndAutoPick() {
+            if (isAnimating) return;
+
+            const activeIndices = [];
+            rewards.forEach((_, idx) => {
+                if (!eliminatedCards.has(idx)) activeIndices.push(idx);
+            });
+
+            if (activeIndices.length === 0) {
+                alert("Tất cả thẻ đã được mở hết! Nhấn 'Đặt Lại Trò Chơi' để chơi ván mới nhé.");
+                return;
+            }
+
+            if (activeIndices.length === 1) {
+                pickAndRevealCard(activeIndices[0]);
+                return;
+            }
+
+            isAnimating = true;
+            startBtn.disabled = true;
+
+            const startTime = performance.now();
+            const duration = 2800; // 2.8s
+            const initialAngle = currentBaseAngle;
+            const totalRotation = Math.PI * 6; // 3 vòng
+            let lastAudio = 0;
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Giảm tốc mượt mà
+                const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+                currentBaseAngle = initialAngle + easeOutProgress * totalRotation;
+
+                if (elapsed - lastAudio > 120 + progress * 160) {
+                    playWhooshSound();
+                    lastAudio = elapsed;
+                }
+
+                updateCardsOnEllipse(currentBaseAngle);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Dừng quay: TẤT CẢ THẺ VẪN NẰM NGUYÊN TRÊN ELIP KHÔNG TRUNG
+                    const chosenIndex = activeIndices[Math.floor(Math.random() * activeIndices.length)];
+                    const chosenEl = document.getElementById(`card-wrap-${chosenIndex}`);
+
+                    chosenEl.classList.add('targeted');
+
+                    setTimeout(() => {
+                        chosenEl.classList.remove('targeted');
+                        pickAndRevealCard(chosenIndex);
+                    }, 650);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Tự động Flip thẻ và phóng to
+        function pickAndRevealCard(index) {
+            isAnimating = true;
+            startBtn.disabled = true;
+            currentChosenIndex = index;
+
+            const el = document.getElementById(`card-wrap-${index}`);
+
+            el.classList.add('focus-center');
+            playFlipSound();
+
+            setTimeout(() => {
+                el.classList.add('flipped');
+                playVictorySound();
+
+                confetti({
+                    particleCount: 100,
+                    spread: 90,
+                    origin: { y: 0.55 }
+                });
+
+                setTimeout(() => {
+                    document.getElementById('rewardEmoji').innerText = rewards[index].icon;
+                    document.getElementById('rewardText').innerText = rewards[index].text;
+                    document.getElementById('rewardModal').classList.add('active');
+                }, 800);
+            }, 300);
+        }
+
+        // Đóng quà và tự động Eliminate thẻ vừa mở
+        function closeReward() {
+            document.getElementById('rewardModal').classList.remove('active');
+
+            if (currentChosenIndex !== null) {
+                const el = document.getElementById(`card-wrap-${currentChosenIndex}`);
+                if (el) {
+                    el.classList.remove('focus-center');
+                    el.classList.add('eliminated');
+                    eliminatedCards.add(currentChosenIndex);
+                }
+                currentChosenIndex = null;
+            }
+
+            // Chia đều lại các thẻ còn lại trên elip
+            updateCardsOnEllipse(currentBaseAngle);
+
+            isAnimating = false;
+            startBtn.disabled = false;
+        }
+
+        // Đặt lại game
+        function resetGame() {
+            if (isAnimating) return;
+            eliminatedCards.clear();
+            currentChosenIndex = null;
+            currentBaseAngle = 0;
+
+            document.querySelectorAll('.card-wrapper').forEach(el => {
+                el.className = 'card-wrapper';
+                el.style.opacity = 1;
+            });
+
+            updateCardsOnEllipse(currentBaseAngle);
+            startShuffleAndAutoPick();
+        }
+
+        // ================= CÀI ĐẶT PHẦN THƯỞNG =================
+        function openConfigModal() {
+            const listContainer = document.getElementById('configList');
+            listContainer.innerHTML = '';
+
+            rewards.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'config-item';
+                row.innerHTML = `
+                    <input type="text" class="icon-input" id="cfg-icon-${idx}" value="${item.icon}" maxlength="3">
+                    <input type="text" class="text-input" id="cfg-text-${idx}" value="${item.text}">
+                `;
+                listContainer.appendChild(row);
+            });
+
+            document.getElementById('configModal').classList.add('active');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.remove('active');
+        }
+
+        function saveConfig() {
+            rewards.forEach((_, idx) => {
+                const iconVal = document.getElementById(`cfg-icon-${idx}`).value.trim();
+                const textVal = document.getElementById(`cfg-text-${idx}`).value.trim();
+                rewards[idx] = {
+                    icon: iconVal || "🎁",
+                    text: textVal || `Phần thưởng ${idx + 1}`
+                };
+            });
+
+            localStorage.setItem('classroom_rewards', JSON.stringify(rewards));
+            closeConfigModal();
+            initCards();
+            resetGame();
+        }
+
+        window.addEventListener('resize', () => {
+            if (!isAnimating) {
+                updateCardsOnEllipse(currentBaseAngle);
+            }
+        });
+
+        // Khởi tạo
+        initCards();
+    </script>
 </body>
 </html>
