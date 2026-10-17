@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐẠI TIỆC SHIN XÌ HƠI! - PAJAMA PARTY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chilanka&family=Comfortaa:wght@700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            font-family: 'Comfortaa', 'Comic Sans MS', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Khung Game */
+        #game-container {
+            width: 1024px;
+            height: 576px;
+            background: linear-gradient(180deg, #ffeedd 0%, #ffdfcc 100%);
+            border: 8px solid #4a3728;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Background phòng ngủ đêm */
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 25%, #fff 2px, transparent 3px),
+                radial-gradient(circle at 80% 15%, #fff 1.5px, transparent 2px);
+            background-color: #f7d5b4;
+            z-index: 1;
+        }
+
+        /* Cửa sổ ban đêm */
+        .window {
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            width: 140px;
+            height: 160px;
+            background: #1a1a3a;
+            border: 8px solid #ff7b7b;
+            border-radius: 50px 50px 0 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .window::before {
+            content: "🌙";
+            font-size: 40px;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            transform: rotate(-15deg);
+        }
+
+        /* Đồ chơi/Trang trí */
+        .tent {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            width: 150px;
+            height: 180px;
+            background: #f4c052;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-left: 10px solid #e09f25;
+            z-index: 2;
+        }
+        .tent-inside {
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            width: 50px;
+            height: 70px;
+            background: #824f0c;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        /* Giao diện trên cùng */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 4px dashed #ff9e9e;
+        }
+
+        .title-box h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #d9383a;
+            text-shadow: 2px 2px 0px #ffd0d0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+        }
+        .stat-btn {
+            background: #fefefe;
+            border: 3px solid #ff9a9e;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #4a3728;
+            box-shadow: 0 4px 0 #ff7b7b;
+        }
+
+        /* Băng rôn chạy trốn */
+        .alert-banner {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff677;
+            border: 3px solid #df9e00;
+            border-radius: 30px;
+            padding: 8px 30px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #4a3000;
+            box-shadow: 0 4px 0 #b37d00;
+            z-index: 5;
+            text-align: center;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        /* Nút âm thanh */
+        .sound-toggle {
+            cursor: pointer;
+            font-size: 24px;
+            background: none;
+            border: none;
+        }
+
+        /* Sân chơi của các bé */
+        .playground {
+            position: absolute;
+            bottom: 70px;
+            left: 0;
+            width: 100%;
+            height: 320px;
+            z-index: 3;
+        }
+
+        /* CẬU BÉ SHIN */
+        .shin {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: url('https://i.ibb.co/L95Zz40/shin-pijama.png') no-repeat center/contain;
+            /* Nếu không tải được ảnh sẽ dùng hình thế tạm thời */
+            background-color: transparent; 
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        /* Hiệu ứng xì hơi */
+        .fart-cloud {
+            position: absolute;
+            background: rgba(122, 219, 102, 0.7);
+            border-radius: 50%;
+            filter: blur(10px);
+            pointer-events: none;
+            z-index: 4;
+            animation: blow-up 1.5s forwards ease-out;
+        }
+
+        .fart-text {
+            position: absolute;
+            color: #4CAF50;
+            font-weight: 900;
+            font-size: 28px;
+            text-shadow: 2px 2px #fff, -2px -2px #000;
+            z-index: 100;
+            animation: bounce 0.5s ease-out;
+            pointer-events: none;
+        }
+
+        /* Học sinh dắt vai */
+        .student {
+            position: absolute;
+            width: 65px;
+            height: 85px;
+            transition: all 0.5s linear;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            cursor: pointer;
+        }
+
+        .student-sprite {
+            width: 50px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            transition: transform 0.3s;
+        }
+
+        /* Các style khác nhau cho HS hoảng loạn và ngất xỉu */
+        .student.running .student-sprite {
+            animation: panicking 0.4s infinite alternate;
+        }
+
+        .student.fainted {
+            transform: rotate(90deg) !important;
+            transition: transform 1s ease-out;
+        }
+        .student.fainted .student-sprite {
+            animation: faintEffect 1.5s forwards;
+        }
+
+        .student-name {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #5c3b1e;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+            margin-top: 2px;
+            box-shadow: 1px 2px 0px rgba(0,0,0,0.2);
+        }
+
+        /* Bóng thoại phụ */
+        .bubble {
+            position: absolute;
+            top: -30px;
+            background: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 8px;
+            font-weight: bold;
+            white-space: nowrap;
+            animation: bounce 1s infinite alternate;
+        }
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+
+        /* UI chân trang */
+        .footer-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: #fff;
+            border-top: 4px solid #ff9e9e;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px;
+            z-index: 10;
+        }
+
+        .counter-setup {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 12px;
+            color: #4a3728;
+        }
+
+        input[type="range"] {
+            accent-color: #ff5e62;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            box-shadow: 0 4px 0 #a30046;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .reset-btn {
+            background: #f0f0f0;
+            color: #555;
+            border: 2px solid #ccc;
+            padding: 8px 15px;
+            font-size: 13px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* Danh sách học sinh */
+        #list-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Modal nhập học sinh */
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            border: 5px solid #4a3728;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        /* Hiệu ứng hoạt hình */
+        @keyframes blow-up {
+            0% { transform: scale(0.1); opacity: 0.8; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes panicking {
+            from { transform: rotate(-10deg) scale(1.1); }
+            to { transform: rotate(10deg) scale(0.9); }
+        }
+        @keyframes faintEffect {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(90deg) grayscale(30%); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="background"></div>
+    <div class="window"></div>
+    <div class="tent"><div class="tent-inside"></div></div>
+
+    <!-- UI Trên -->
+    <div class="header">
+        <div class="title-box">
+            <h1>💨 ĐẠI TIỆC SHIN XÌ HƠI! <button id="list-btn" onclick="toggleModal(true)">📝 DS học sinh</button></h1>
+        </div>
+        <div class="stats">
+            <div class="stat-btn">ĐANG CHƠI: <span id="active-count">10</span></div>
+            <div class="stat-btn">ĐÃ XỈU: <span id="fainted-count">0</span></div>
+            <button class="sound-toggle" onclick="toggleSound()">🔊</button>
+        </div>
+    </div>
+
+    <div class="alert-banner">🏃‍♂️ CHẠY MAU! CÁC BẠN ĐANG CHẠY TRỐN KHẮP PHÒNG!</div>
+
+    <!-- Sân chơi game -->
+    <div class="playground" id="playground">
+        <!-- Shin ở giữa mâm mông -->
+        <div class="shin" id="shin-character" onclick="fartNow()"></div>
+    </div>
+
+    <!-- UI Dưới -->
+    <div class="footer-controls">
+        <div class="counter-setup">
+            <span>SỐ BẠN NGẤT MỖI LỰT:</span>
+            <input type="range" id="faint-qty" min="1" max="5" value="3" oninput="document.getElementById('qty-show').innerText = this.value">
+            <span id="qty-show" style="color:#ee0979; font-size:18px;">3</span>
+        </div>
+
+        <button class="action-btn" onclick="fartNow()">
+            🤢 ĐANG CHẠY TRỐN... (THẢ RẮM!) 💨
+        </button>
+
+        <button class="reset-btn" onclick="resetGame()">🔄 Gọi lại từ đầu</button>
+    </div>
+</div>
+
+<!-- Modal để thay đổi tên học sinh -->
+<div class="modal" id="student-modal">
+    <div class="modal-content">
+        <h3>Danh Sách Học Sinh Trong Lớp</h3>
+        <p>Nhập tên học sinh (mỗi tên một dòng):</p>
+        <textarea id="students-input">Hoàng Minh Châu
+Tạ Gia Hân
+Phan Đức Phúc
+Trịnh Thùy Linh
+Vũ Hoàng Long
+Phạm Tiến Đạt
+Hồng Hứa Thy
+Anh Thư
+Gia Bảo
+Phương Vy</textarea>
+        <br>
+        <button class="action-btn" style="font-size:14px; display:inline-block;" onclick="saveStudents()">Lưu Danh Sách</button>
+    </div>
+</div>
+
+<!-- Audio xì hơi, ngã vui nhộn tạo sẵn bằng Web Audio API -->
+<script>
+    let isSoundOn = true;
+    let students = [];
+    const playground = document.getElementById('playground');
+    const studentModal = document.getElementById('student-modal');
+
+    // Các sprite học sinh (ảnh thay thế vẽ bằng CSS & Icon)
+    const studentSprites = [
+        '🧸', '👦', '👧', '👶', '🐱', '🐶', '🦄', '🦁', '🦊', '🐸'
+    ];
+
+    function toggleSound() {
+        isSoundOn = !isSoundOn;
+        document.querySelector('.sound-toggle').innerText = isSoundOn ? "🔊" : "🔇";
+    }
+
+    // Tạo âm thanh xì hơi giả lập vui nhộn (vì không có file âm thanh sẵn)
+    function playFartSound() {
+        if(!isSoundOn) return;
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Tiếng xì hơi dồn dập
+        let osc = ctx.createOscillator();
+        let gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.5);
+        
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.6);
+    }
+
+    function playFaintSound() {
+        if(!isSoundOn) return;
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = ctx.createOscillator();
+        let gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.8);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.8);
+    }
+
+    // Khởi tạo/Đặt lại Game
+    function initGame() {
+        // Xoá các học sinh cũ (giữ lại Shin)
+        const kids = playground.querySelectorAll('.student');
+        kids.forEach(k => k.remove());
+
+        const input = document.getElementById('students-input').value;
+        students = input.split('\n').filter(name => name.trim() !== "");
+
+        document.getElementById('active-count').innerText = students.length;
+        document.getElementById('fainted-count').innerText = 0;
+
+        students.forEach((name, index) => {
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student running';
+            studentDiv.id = `student-${index}`;
+
+            // Biểu tượng học sinh ngẫu nhiên
+            const icon = studentSprites[index % studentSprites.length];
+
+            studentDiv.innerHTML = `
+                <div class="bubble" style="display:none;">CHẠY MAU!</div>
+                <div class="student-sprite" style="font-size: 40px; text-align: center;">${icon}</div>
+                <div class="student-name">${name}</div>
+            `;
+
+            // Vị trí ngẫu nhiên không đè lên Shin ở giữa
+            randomizePosition(studentDiv);
+            playground.appendChild(studentDiv);
+        });
+
+        startChaosMoving();
+    }
+
+    function randomizePosition(element) {
+        let x, y;
+        do {
+            x = Math.random() * 850 + 50;
+            y = Math.random() * 150 + 20; // Tránh tít lên trời hoặc xuống UI dưới
+        } while (x > 400 && x < 600); // Tránh Shin ở giữa (khoảng 400px - 600px)
+
+        element.style.left = `${x}px`;
+        element.style.bottom = `${y}px`;
+    }
+
+    // Di chuyển hỗn loạn liên tục
+    let moveInterval;
+    function startChaosMoving() {
+        if(moveInterval) clearInterval(moveInterval);
+        moveInterval = setInterval(() => {
+            const kids = playground.querySelectorAll('.student.running');
+            kids.forEach(kid => {
+                let currentLeft = parseFloat(kid.style.left);
+                let currentBottom = parseFloat(kid.style.bottom);
+
+                // Đi lòng vòng ngẫu nhiên hoảng hốt
+                let dx = (Math.random() - 0.5) * 120;
+                let dy = (Math.random() - 0.5) * 60;
+
+                let newX = Math.max(20, Math.min(940, currentLeft + dx));
+                let newY = Math.max(10, Math.min(200, currentBottom + dy));
+
+                // Đôi khi la hét
+                const bubble = kid.querySelector('.bubble');
+                if(Math.random() > 0.75 && bubble.style.display === 'none') {
+                    bubble.style.display = 'block';
+                    setTimeout(() => bubble.style.display = 'none', 1200);
+                }
+
+                kid.style.left = `${newX}px`;
+                kid.style.bottom = `${newY}px`;
+            });
+        }, 1000);
+    }
+
+    // XỈ HƠI & BẮT HỌC SINH NGẤT XỈU
+    function fartNow() {
+        playFartSound();
+
+        // 1. Hiệu ứng Shin nhún mông / thả khói
+        const shin = document.getElementById('shin-character');
+        shin.style.transform = 'translateX(-50%) scale(1.3) skewX(-10deg)';
+        setTimeout(() => {
+            shin.style.transform = 'translateX(-50%) scale(1)';
+        }, 300);
+
+        // Hiệu ứng "BỤP! XỲYYY!"
+        const fartTxt = document.createElement('div');
+        fartTxt.className = 'fart-text';
+        fartTxt.style.left = '50%';
+        fartTxt.style.bottom = '130px';
+        fartTxt.innerText = "💨 BỤP! XỲYYY! 🤢";
+        playground.appendChild(fartTxt);
+        setTimeout(() => fartTxt.remove(), 1200);
+
+        // Khói rắm lan tỏa
+        for(let i=0; i<15; i++) {
+            const cloud = document.createElement('div');
+            cloud.className = 'fart-cloud';
+            cloud.style.left = `${450 + (Math.random() - 0.5) * 120}px`;
+            cloud.style.bottom = `${50 + (Math.random() - 0.5) * 50}px`;
+            let size = Math.random() * 40 + 30;
+            cloud.style.width = `${size}px`;
+            cloud.style.height = `${size}px`;
+            playground.appendChild(cloud);
+            setTimeout(() => cloud.remove(), 1500);
+        }
+
+        // 2. Chọn ngẫu nhiên học sinh chạy trốn để ngất xỉu
+        const activeKids = Array.from(playground.querySelectorAll('.student.running'));
+        if(activeKids.length === 0) {
+            alert("Tất cả học sinh đã ngất xỉu vì quá thối rồi! Hãy nhấn 'Gọi lại từ đầu' nhé!");
+            return;
+        }
+
+        const qtyToFaint = parseInt(document.getElementById('faint-qty').value);
+        let selectedCount = Math.min(qtyToFaint, activeKids.length);
+
+        // Xáo trộn mảng để chọn ngẫu nhiên
+        const shuffled = activeKids.sort(() => 0.5 - Math.random());
+
+        for (let i = 0; i < selectedCount; i++) {
+            const kid = shuffled[i];
+            
+            // Đổi trạng thái sang ngất xỉu dính rắm
+            kid.classList.remove('running');
+            kid.classList.add('fainted');
+
+            // Biểu cảm ngất xỉu, thôi miên
+            const sprite = kid.querySelector('.student-sprite');
+            sprite.innerHTML = "😵‍💫"; // Biểu tượng mắt xoắn ốc
+            
+            const nameDiv = kid.querySelector('.student-name');
+            nameDiv.style.background = '#ffdada';
+            nameDiv.style.color = '#aa0000';
+
+            const bubble = kid.querySelector('.bubble');
+            bubble.innerText = "🤢 Thối quá... ngất!";
+            bubble.style.display = 'block';
+
+            // Âm thanh rơi rụng
+            setTimeout(() => playFaintSound(), i * 200);
+        }
+
+        // Cập nhật điểm số
+        const activeCount = playground.querySelectorAll('.student.running').length;
+        const faintedCount = playground.querySelectorAll('.student.fainted').length;
+        document.getElementById('active-count').innerText = activeCount;
+        document.getElementById('fainted-count').innerText = faintedCount;
+    }
+
+    // Modal quản lý danh sách học sinh
+    function toggleModal(show) {
+        studentModal.style.display = show ? 'flex' : 'none';
+    }
+
+    function saveStudents() {
+        toggleModal(false);
+        initGame();
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    // Tự động khởi chạy
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
