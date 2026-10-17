@@ -1,884 +1,515 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thẻ Đặc Quyền - Linh Thú 3D Vũ Trụ</title>
-    <!-- Pháo hoa Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ĐẠI TIỆC SHIN XÌ HƠI! - 3D GITHUB EDITION</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Mali:wght@700;900&display=swap');
 
-        body {
-            font-family: 'Mali', cursive, sans-serif;
-            background: radial-gradient(circle at center, #2b134d 0%, #0a0515 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 15px;
-            overflow-x: hidden;
-            color: #fff;
-        }
+  * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
 
-        /* Banner tiêu đề phong cách Cute Magic */
-        .title-banner {
-            background: linear-gradient(90deg, #ff0844 0%, #ffb199 100%);
-            color: #fff;
-            padding: 10px 45px;
-            border-radius: 50px;
-            font-size: 2.1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            box-shadow: 0 0 25px rgba(255, 8, 68, 0.6), inset 0 -4px 0 rgba(0,0,0,0.2);
-            border: 4px solid #fff;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-            animation: bannerFloat 3s ease-in-out infinite alternate;
-        }
+  body {
+    background: #121318;
+    font-family: 'Comfortaa', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-        @keyframes bannerFloat {
-            from { transform: translateY(0); }
-            to { transform: translateY(-5px); }
-        }
+  /* Khung chứa game chuẩn 16:9 */
+  #game-app {
+    width: 1060px;
+    height: 596px;
+    background: linear-gradient(180deg, #d8f5d3 0%, #b8e6b0 70%, #9cd892 100%);
+    border: 8px solid #3d2616;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  }
 
-        /* Sân khấu 3D lơ lửng trên không trung */
-        .arena-container {
-            position: relative;
-            width: 100vw;
-            max-width: 1350px;
-            height: 560px;
-            perspective: 1600px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  /* Header trên cùng */
+  .header-bar {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 74px;
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 4px solid #ffccd5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 50;
+  }
+  .header-title-box h1 {
+    font-size: 22px;
+    color: #e63946;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-title-box p {
+    font-size: 11px;
+    color: #666;
+  }
+  .header-badges {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .badge {
+    background: #fff;
+    border: 2px solid #ffb3c1;
+    border-radius: 14px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #4a3427;
+    box-shadow: 0 3px 0 #ffccd5;
+  }
+  .badge b { color: #d90429; font-size: 15px; }
 
-        /* Thẻ bao ngoài */
-        .card-wrapper {
-            position: absolute;
-            width: 180px;
-            height: 245px;
-            perspective: 1200px;
-            cursor: pointer;
-            transition: opacity 0.5s ease, filter 0.3s;
-            will-change: transform;
-        }
+  .btn-ui {
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+  }
 
-        /* Khối lật 3D (Flip Card) */
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 24px;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
+  /* Băng rôn trạng thái */
+  .status-banner {
+    position: absolute;
+    top: 86px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff8bd;
+    border: 3px solid #f4a261;
+    border-radius: 30px;
+    padding: 7px 32px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a2800;
+    box-shadow: 0 4px 0 #e76f51;
+    z-index: 40;
+    white-space: nowrap;
+  }
 
-        .card-wrapper.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
+  /* Phòng ngủ ban đêm */
+  .room-window {
+    position: absolute; top: 88px; left: 115px; width: 215px; height: 185px;
+    background: #141738; border: 10px solid #ffb5c5; border-bottom: 16px solid #ffb5c5; border-radius: 20px 20px 0 0; z-index: 2;
+  }
+  .room-window::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 6px; background: #ffb5c5; transform: translateY(-50%); }
+  .room-window::after { content: ''; position: absolute; left: 50%; top: 0; width: 6px; height: 100%; background: #ffb5c5; transform: translateX(-50%); }
+  .window-moon { position: absolute; top: 18px; right: 28px; width: 45px; height: 45px; border-radius: 50%; box-shadow: 10px 10px 0 0 #ffeb3b; }
+  
+  .aquarium {
+    position: absolute; bottom: 125px; left: 35px; width: 165px; height: 105px;
+    background: linear-gradient(180deg, rgba(162, 222, 255, 0.85) 0%, rgba(68, 172, 238, 0.92) 100%);
+    border: 5px solid #dcdcdc; border-radius: 12px; z-index: 3; display: flex; justify-content: center; align-items: center; font-size: 26px;
+  }
+  .tent-shelter {
+    position: absolute; bottom: 105px; right: 25px; width: 155px; height: 185px; background: #f7d070; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); border-left: 12px solid #dfa838; z-index: 3;
+  }
+  .tent-door {
+    position: absolute; bottom: 0; left: 50px; width: 52px; height: 70px; background: #6e4719; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
 
-        /* Mặt thẻ */
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 24px;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 12px;
-            border: 3px solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0 20px rgba(255, 117, 140, 0.5), 0 10px 25px rgba(0,0,0,0.4);
-        }
+  /* Sân khấu */
+  .room-stage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+  #smoke-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none; }
 
-        /* Mặt úp: Linh thú 3D hoạt hình sống động */
-        .card-back {
-            background: linear-gradient(145deg, #ff758c 0%, #ff7eb3 50%, #7afcff 100%);
-            animation: auraPulse 2.5s infinite alternate ease-in-out;
-            overflow: hidden;
-        }
+  /* Shin 3D chuẩn từ shin.png */
+  .shin-wrapper {
+    position: absolute; bottom: 110px; left: 580px; width: 150px; height: 165px; z-index: 25; pointer-events: auto; cursor: pointer;
+  }
+  .shin-img-3d {
+    width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35));
+    transition: transform 0.2s;
+  }
+  .shin-wrapper:hover .shin-img-3d { transform: scale(1.05); }
 
-        @keyframes auraPulse {
-            0% { box-shadow: 0 0 15px rgba(255, 117, 140, 0.6), 0 0 30px rgba(255, 126, 179, 0.4); }
-            100% { box-shadow: 0 0 30px rgba(255, 75, 43, 0.9), 0 0 55px rgba(255, 140, 0, 0.7); }
-        }
+  @keyframes buttWiggle {
+    0% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(8px) rotate(6deg); }
+    50% { transform: translateX(-8px) rotate(-6deg); }
+    75% { transform: translateX(6px) rotate(4deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+  }
+  .shin-farting { animation: buttWiggle 0.35s infinite ease-in-out; }
 
-        /* Khung chứa ảnh linh thú 3D */
-        .animal-avatar-container {
-            position: relative;
-            width: 110px;
-            height: 110px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 5px;
-        }
+  /* Chữ hoạt hình xì hơi */
+  .fart-comic-text {
+    position: absolute; bottom: 250px; left: 600px;
+    font-family: 'Mali', cursive; font-size: 38px; font-weight: 900; color: #38b000;
+    text-shadow: 3px 3px 0 #fff, -3px -3px 0 #fff, 5px 5px 0 #1b4332;
+    z-index: 60; pointer-events: none; animation: comicPop 0.9s forwards ease-out; white-space: nowrap;
+  }
+  @keyframes comicPop {
+    0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+    40% { transform: scale(1.3) rotate(6deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg) translateY(-40px); opacity: 0; }
+  }
 
-        /* Vòng hào quang thiên thần xoay quanh linh thú */
-        .animal-halo {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-            animation: rotateHalo 6s linear infinite;
-        }
+  /* Học sinh chạy trốn */
+  .student-item {
+    position: absolute; width: 95px; height: 120px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    transition: left 0.8s linear, bottom 0.8s linear; z-index: 18; pointer-events: auto;
+  }
+  .student-item.panic-mode { transition: left 0.38s linear, bottom 0.38s linear !important; }
+  
+  .student-box-div {
+    width: 80px; height: 95px; background: #fffbe6; border: 3px solid #3d2616; border-radius: 12px;
+    display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 13px; color: #3d2616;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25); position: relative; overflow: hidden;
+  }
+  .student-item.fainted { transform: rotate(86deg) translateY(24px) !important; z-index: 12 !important; }
 
-        @keyframes rotateHalo {
-            0% { transform: rotate(0deg) scale(0.95); }
-            50% { transform: rotate(180deg) scale(1.08); }
-            100% { transform: rotate(360deg) scale(0.95); }
-        }
+  @keyframes runBounce {
+    0% { transform: translateY(0) rotate(-6deg); }
+    50% { transform: translateY(-12px) rotate(6deg); }
+    100% { transform: translateY(0) rotate(-6deg); }
+  }
+  .student-item.running .student-box-div { animation: runBounce 0.35s infinite ease-in-out; }
+  .student-item.running.panic-mode .student-box-div { animation: runBounce 0.16s infinite ease-in-out !important; }
 
-        /* Ảnh con vật 3D */
-        .animal-img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.35));
-            animation: animalFloat 2.6s ease-in-out infinite alternate;
-            z-index: 2;
-        }
+  .student-tag {
+    background: #fff; border: 2px solid #3d2616; border-radius: 8px; padding: 2px 8px;
+    font-size: 11px; font-weight: bold; color: #222; white-space: nowrap; margin-top: 2px; box-shadow: 0 2px 0 #3d2616;
+  }
+  .student-item.fainted .student-tag { background: #ffd6d6; border-color: #c9184a; color: #c9184a; }
 
-        @keyframes animalFloat {
-            0% { transform: translateY(0px) rotate(0deg) scale(1); }
-            50% { transform: translateY(-8px) rotate(3deg) scale(1.05); }
-            100% { transform: translateY(4px) rotate(-3deg) scale(0.98); }
-        }
+  /* Bong thoại vui nhộn */
+  .chat-bubble {
+    position: absolute; top: -28px; background: #fff; border: 2px solid #222; border-radius: 10px;
+    padding: 3px 8px; font-size: 10px; font-weight: bold; color: #111; white-space: nowrap; box-shadow: 0 3px 0 rgba(0,0,0,0.18); z-index: 35;
+  }
+  .chat-bubble.panic-bubble { background: #fff3b0; border-color: #d90429; color: #b7094c; }
+  .chat-bubble::after {
+    content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+    border-width: 5px 5px 0; border-style: solid; border-color: #222 transparent;
+  }
 
-        .animal-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #ffe600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
-        }
+  /* Vòng xoáy thôi miên */
+  @keyframes hypnoSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .hypno-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85);
+    display: none; justify-content: center; align-items: center; font-size: 26px; font-weight: bold; color: #d90429;
+    animation: hypnoSpin 0.4s infinite linear;
+  }
+  .student-item.fainted .hypno-overlay { display: flex; }
 
-        .card-label {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #d63384;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 5px 16px;
-            border-radius: 30px;
-            border: 2px dashed #d63384;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+  /* Footer điều khiển */
+  .footer-bar {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 82px; background: #fff; border-top: 4px solid #ffccd5;
+    display: flex; justify-content: space-around; align-items: center; padding: 10px 24px; z-index: 50;
+  }
+  .slider-box { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: bold; color: #4a3427; }
+  .slider-num { background: #fff0f3; border: 2px solid #ff4d6d; color: #c9184a; padding: 3px 12px; border-radius: 8px; font-size: 18px; min-width: 38px; text-align: center; }
+  .btn-fart-action {
+    background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%); color: white; border: none; padding: 13px 42px;
+    font-size: 16px; font-weight: bold; border-radius: 30px; box-shadow: 0 6px 0 #800f2f; cursor: pointer; transition: all 0.1s;
+  }
+  .btn-fart-action:active { transform: translateY(4px); box-shadow: 0 2px 0 #800f2f; }
+  .btn-fart-action:disabled { background: linear-gradient(135deg, #9b5de5 0%, #f15bb5 100%); cursor: wait; }
 
-        /* Mặt ngửa (Lộ phần thưởng) */
-        .card-front {
-            background: linear-gradient(145deg, #ffffff 0%, #fff0f5 100%);
-            color: #333;
-            transform: rotateY(180deg);
-            padding: 20px 15px;
-            text-align: center;
-            border: 4px solid #ff477e;
-            box-shadow: 0 0 35px #ffe600, 0 0 60px #ff7b00;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .card-front .reward-icon {
-            font-size: 4.2rem;
-            animation: bounceIcon 1s infinite alternate;
-        }
-
-        @keyframes bounceIcon {
-            from { transform: translateY(0); }
-            to { transform: translateY(-8px); }
-        }
-
-        .card-front .reward-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #d63384;
-            line-height: 1.35;
-        }
-
-        /* Hiệu ứng khóa mục tiêu ngẫu nhiên */
-        .card-wrapper.targeted {
-            filter: brightness(1.35);
-            box-shadow: 0 0 45px #00f2fe, 0 0 80px #4facfe !important;
-            z-index: 400 !important;
-        }
-
-        /* Thẻ được chọn phóng to ra giữa màn hình */
-        .card-wrapper.focus-center {
-            z-index: 500 !important;
-            transform: translate(0px, 0px) scale(1.48) !important;
-            transition: transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
-        }
-
-        /* Thẻ bị loại trừ */
-        .card-wrapper.eliminated {
-            transform: scale(0) rotate(180deg) !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: transform 0.5s ease, opacity 0.5s ease !important;
-        }
-
-        /* Nút điều khiển */
-        .controls {
-            margin-top: 15px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .btn {
-            padding: 12px 28px;
-            font-family: inherit;
-            font-size: 1.15rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-start {
-            background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
-            color: #fff;
-            border: 2px solid #fff;
-        }
-
-        .btn-reset {
-            background: rgba(255, 255, 255, 0.85);
-            color: #333;
-        }
-
-        .btn-config {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Modal Quà Nhận Được */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.78);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-card {
-            background: #fff;
-            width: 90%;
-            max-width: 480px;
-            border-radius: 35px;
-            border: 8px solid #ff477e;
-            padding: 35px 25px;
-            text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 50px rgba(255, 71, 126, 0.6);
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes popUp {
-            from { transform: scale(0.6); }
-            to { transform: scale(1); }
-        }
-
-        .modal-header-tag {
-            background: #ffe066;
-            color: #d63384;
-            padding: 8px 25px;
-            border-radius: 20px;
-            display: inline-block;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            border: 3px solid #ff922b;
-        }
-
-        .modal-emoji {
-            font-size: 5.5rem;
-            margin: 10px 0;
-            animation: bounceEmoji 1.5s infinite ease-in-out;
-        }
-
-        @keyframes bounceEmoji {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .modal-text {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2b2d42;
-            margin: 20px 0 30px 0;
-            line-height: 1.4;
-        }
-
-        .btn-claim {
-            background: #51cf66;
-            color: white;
-            border: none;
-            font-family: inherit;
-            font-size: 1.35rem;
-            font-weight: 700;
-            padding: 12px 40px;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 18px rgba(81, 207, 102, 0.5);
-            transition: all 0.2s;
-        }
-
-        .btn-claim:hover {
-            transform: scale(1.06);
-            background: #40c057;
-        }
-
-        /* Modal Cài Đặt */
-        .config-modal-card {
-            background: #251d38;
-            color: #fff;
-            width: 90%;
-            max-width: 600px;
-            max-height: 85vh;
-            border-radius: 25px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            border: 3px solid #7952b3;
-        }
-
-        .config-header {
-            font-size: 1.6rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 15px;
-            color: #ffb199;
-        }
-
-        .config-list {
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .config-item {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: rgba(255,255,255,0.06);
-            padding: 8px 12px;
-            border-radius: 12px;
-        }
-
-        .config-item input.icon-input {
-            width: 55px;
-            text-align: center;
-            font-size: 1.4rem;
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #191424;
-            color: #fff;
-        }
-
-        .config-item input.text-input {
-            flex: 1;
-            padding: 8px 12px;
-            font-family: inherit;
-            font-size: 1rem;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #191424;
-            color: #fff;
-        }
-
-        .config-footer {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-    </style>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Shin Bút Chì</title>
-    <style>
-        body {
-            text-align: center;
-            background-color: #fce4ec;
-            font-family: Arial, sans-serif;
-        }
-        
-        /* Chỗ chứa nền game */
-        .game-board {
-            position: relative;
-            width: 800px;
-            height: 450px;
-            margin: 20px auto;
-            background: #fff;
-            border: 3px solid #ff4081;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Chỉnh kích thước & vị trí nhân vật */
-        .character-shin {
-            position: absolute;
-            bottom: 30px;
-            left: 100px;
-            width: 150px; /* Chỉnh độ to nhỏ của Shin */
-            height: auto;
-        }
-
-        .character-ban-shin {
-            position: absolute;
-            bottom: 30px;
-            left: 300px;
-            width: 130px; /* Chỉnh độ to nhỏ của bạn Shin */
-            height: auto;
-        }
-    </style>
+  .modal-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 100; display: none; justify-content: center; align-items: center;
+  }
+  .modal-box { background: #fff; padding: 24px; border-radius: 20px; width: 440px; text-align: center; border: 5px solid #4a3427; }
+  .modal-box textarea { width: 100%; height: 160px; padding: 10px; border-radius: 10px; border: 2px solid #ccc; font-family: inherit; margin: 12px 0; }
+</style>
 </head>
 <body>
 
-    <h1>TIỆC SHIN XÌ HƠI</h1>
+<div id="game-app">
+  <div class="room-window"><div class="window-moon"></div></div>
+  <div class="aquarium">🐠 🌿</div>
+  <div class="tent-shelter"><div class="tent-door"></div></div>
 
-    <div class="game-board">
-        <!-- ĐÂY LÀ ĐOẠN GỌI ĐÚNG FILE ẢNH CỦA MIU -->
-        <img class="character-shin" src="./shin.png" alt="Shin">
-        <img class="character-ban-shin" src="./ban shin.png" alt="Bạn Shin">
+  <!-- Header -->
+  <div class="header-bar">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 30px;">💨</span>
+      <div class="header-title-box">
+        <h1>ĐẠI TIỆC SHIN XÌ HƠI!</h1>
+        <p>Phiên bản GitHub chuẩn 3D với file shin.png!</p>
+      </div>
+      <button class="btn-ui" onclick="openStudentModal()" style="color: #2b9348;">📝 Đổi Tên HS</button>
+    </div>
+    <div class="header-badges">
+      <div class="badge">ĐANG CHƠI: <b id="count-playing">10</b></div>
+      <div class="badge">ĐÃ GỌI: <b id="count-fainted">0</b></div>
+      <button class="btn-ui" onclick="toggleAudio()" id="btn-sound">🔊</button>
+    </div>
+  </div>
+
+  <div class="status-banner" id="status-banner">🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!</div>
+
+  <canvas id="smoke-canvas"></canvas>
+
+  <div class="room-stage" id="room-stage">
+    <!-- SHIN 3D DÙNG FILE SHIN.PNG -->
+    <div class="shin-wrapper" id="shin-boy" onclick="triggerFartEvent()">
+      <img id="shin-img" class="shin-img-3d" src="shin.png" alt="Shin 3D">
+      <div class="shin-tag">SHIN 🍮</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <div class="slider-box">
+      <span>SỐ BẠN BỊ NGẤT MỖI LƯỢT:</span>
+      <input type="range" id="faint-range" min="1" max="5" value="3" oninput="document.getElementById('num-preview').innerText = this.value">
+      <span class="slider-num" id="num-preview">3</span>
     </div>
 
-</body>
-</html>
-    <div class="title-banner">⭐ THẺ ĐẶC QUYỀN LINH THÚ 3D ⭐</div>
+    <button class="btn-fart-action" id="btn-main-action" onclick="triggerFartEvent()">
+      💨 SHIN XÌ HƠI! 🤢
+    </button>
 
-    <!-- Sân khấu Quỹ đạo Elip -->
-    <div class="arena-container" id="arena"></div>
+    <button class="btn-ui" onclick="resetGameStage()">🔄 Gọi lại từ đầu</button>
+  </div>
+</div>
 
-    <!-- Nút điều khiển -->
-    <div class="controls">
-        <button class="btn btn-start" id="startBtn" onclick="startShuffleAndAutoPick()">
-            🚀 Bắt Đầu Quay & Chọn Thẻ
-        </button>
-        <button class="btn btn-reset" onclick="resetGame()">
-            🔄 Đặt Lại Trò Chơi
-        </button>
-        <button class="btn btn-config" onclick="openConfigModal()">
-            ⚙️ Cài Đặt Quà
-        </button>
-    </div>
+<!-- Modal đổi tên -->
+<div class="modal-overlay" id="name-modal">
+  <div class="modal-box">
+    <h3 style="color: #c9184a;">Danh Sách Học Sinh Trong Lớp</h3>
+    <textarea id="student-names-input">Kazama
+Masao
+Nene
+Bo-chan
+Hoàng Minh Châu
+Tạ Gia Hân
+Phan Đức Phúc
+Trịnh Thùy Linh
+Vũ Hoàng Long
+Phạm Tiến Đạt</textarea>
+    <br>
+    <button class="btn-fart-action" style="padding: 10px 24px; font-size: 14px; margin: 0 auto;" onclick="saveStudentNames()">Lưu & Bắt Đầu</button>
+  </div>
+</div>
 
-    <!-- Modal Chi Tiết Quà -->
-    <div class="modal" id="rewardModal">
-        <div class="modal-card">
-            <div class="modal-header-tag">✨ ĐẶC QUYỀN CỦA EM ✨</div>
-            <div class="modal-emoji" id="rewardEmoji">👑</div>
-            <div class="modal-text" id="rewardText">Được làm lớp trưởng 1 tuần</div>
-            <button class="btn-claim" onclick="closeReward()">Nhận Thưởng 🎉</button>
-        </div>
-    </div>
+<script>
+  let soundEnabled = true;
+  let isFartingPhase = false;
+  let students = [];
+  const roomStage = document.getElementById('room-stage');
+  const canvas = document.getElementById('smoke-canvas');
+  const ctx = canvas.getContext('2d');
+  const banner = document.getElementById('status-banner');
+  const mainBtn = document.getElementById('btn-main-action');
 
-    <!-- Modal Chỉnh Sửa Quà -->
-    <div class="modal" id="configModal">
-        <div class="config-modal-card">
-            <div class="config-header">⚙️ Danh Sách Đặc Quyền Của Lớp</div>
-            <div class="config-list" id="configList"></div>
-            <div class="config-footer">
-                <button class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
-                <button class="btn btn-claim" onclick="saveConfig()">Lưu Lại</button>
-            </div>
-        </div>
-    </div>
+  function resizeCanvas() {
+    canvas.width = 1060;
+    canvas.height = 596;
+  }
+  resizeCanvas();
 
-    <script>
-        // Danh sách 8 Bé Thú 3D Cute Fluent 3D
-        const animalList = [
-            { name: "Gấu Trúc 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Panda.png" },
-            { name: "Mèo Thần Tài 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Cat%20Face.png" },
-            { name: "Kỳ Lân Mộng Mơ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Unicorn.png" },
-            { name: "Rồng Con May Mắn", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dragon%20Face.png" },
-            { name: "Khủng Long Tí Nị", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Sauropod.png" },
-            { name: "Cún Corgi Vui Vẻ", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Dog%20Face.png" },
-            { name: "Thỏ Bảy Màu 3D", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Rabbit%20Face.png" },
-            { name: "Chim Cánh Cụt Cute", img: "https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Penguin.png" }
-        ];
+  const funnyPanicQuotes = ["🏃‍♂️ CHẠY MAU!", "🤢 Thúi quáaa!", "😷 Bịt mũi lại!", "🆘 Cứu tớ với!", "💨 Khói độc kìa!", "😭 Ngạt thở!"];
 
-        const defaultRewards = [
-            { text: "Được làm Lớp Trưởng trong 1 tuần!", icon: "👑" },
-            { text: "Miễn 1 lần kiểm tra bài cũ / bài tập!", icon: "📜" },
-            { text: "Được đổi chỗ ngồi theo ý thích 3 ngày!", icon: "🪑" },
-            { text: "Nhận 1 phần quà bí mật từ Thầy/Cô!", icon: "🎁" },
-            { text: "Được cộng 1 điểm vào bài thi tới!", icon: "💯" },
-            { text: "Được yêu cầu một bạn bất kỳ hát 1 bài!", icon: "🎤" },
-            { text: "Làm Quản Trò giờ giải lao buổi hôm nay!", icon: "🎮" },
-            { text: "Được miễn trực nhật lớp 1 buổi!", icon: "🧹" }
-        ];
+  function playAudioEffect(type) {
+    if (!soundEnabled) return;
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type === 'fart' ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(type === 'fart' ? 140 : 340, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.6);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+    } catch(e){}
+  }
 
-        let rewards = JSON.parse(localStorage.getItem('classroom_rewards')) || defaultRewards;
-        let eliminatedCards = new Set();
-        let currentChosenIndex = null;
-        let isAnimating = false;
-        let currentBaseAngle = 0;
+  function toggleAudio() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+  }
 
-        const arena = document.getElementById('arena');
-        const startBtn = document.getElementById('startBtn');
+  let smokeParticles = [];
+  class Smoke {
+    constructor(x, y) {
+      this.x = x; this.y = y;
+      this.vx = (Math.random() - 0.7) * 7.5;
+      this.vy = (Math.random() - 0.5) * 5;
+      this.size = Math.random() * 26 + 18;
+      this.alpha = 0.85;
+      this.color = Math.random() > 0.5 ? 'rgba(118, 186, 0, ' : 'rgba(167, 219, 78, ';
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.size += 0.9; this.alpha -= 0.01; }
+    draw() {
+      ctx.fillStyle = this.color + this.alpha + ')';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+    }
+  }
 
-        // Âm thanh sống động
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function renderSmokeLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = smokeParticles.length - 1; i >= 0; i--) {
+      smokeParticles[i].update();
+      if (smokeParticles[i].alpha <= 0) smokeParticles.splice(i, 1);
+      else smokeParticles[i].draw();
+    }
+    requestAnimationFrame(renderSmokeLoop);
+  }
+  requestAnimationFrame(renderSmokeLoop);
 
-        function playWhooshSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.12);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.12);
+  let moveInterval = null;
+  function startMovementLoop(panicMode = false) {
+    if (moveInterval) clearInterval(moveInterval);
+    moveInterval = setInterval(() => {
+      document.querySelectorAll('.student-item.running').forEach(kid => {
+        let curLeft = parseFloat(kid.style.left);
+        let curBottom = parseFloat(kid.style.bottom);
+        let dx = (Math.random() - 0.5) * (panicMode ? 200 : 120);
+        let dy = (Math.random() - 0.5) * (panicMode ? 80 : 50);
+        let newX = Math.max(35, Math.min(930, curLeft + dx));
+        let newY = Math.max(105, Math.min(265, curBottom + dy));
+        if (newX > 520 && newX < 740) newX = newX > 630 ? 760 : 500;
+        kid.style.left = `${newX}px`; kid.style.bottom = `${newY}px`;
+
+        const bubble = kid.querySelector('.chat-bubble');
+        if (panicMode) {
+          bubble.classList.add('panic-bubble');
+          if (Math.random() > 0.4) {
+            bubble.innerText = funnyPanicQuotes[Math.floor(Math.random() * funnyPanicQuotes.length)];
+            bubble.style.display = 'block';
+          }
+        } else {
+          bubble.classList.remove('panic-bubble');
+          if (Math.random() > 0.85) bubble.style.display = 'none';
         }
+      });
+    }, panicMode ? 350 : 1100);
+  }
 
-        function playFlipSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(420, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1050, audioCtx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
+  function spawnComicBurst(text) {
+    const comic = document.createElement('div');
+    comic.className = 'fart-comic-text'; comic.innerText = text;
+    roomStage.appendChild(comic);
+    setTimeout(() => comic.remove(), 1000);
+  }
+
+  function triggerFartEvent() {
+    if (isFartingPhase) return;
+    const activeKids = Array.from(document.querySelectorAll('.student-item.running'));
+    if (!activeKids.length) return alert("Tất cả đã xỉu hết rồi!");
+
+    isFartingPhase = true;
+    mainBtn.disabled = true; mainBtn.innerText = '😱 ĐANG CHẠY TRỐN...';
+    banner.innerText = '🏃‍♂️ CHẠY MAU! CÁC BẠN ĐANG CHẠY TRỐN KHẮP PHÒNG!';
+    banner.style.background = '#ffd166';
+
+    const shinImg = document.getElementById('shin-img');
+    shinImg.classList.add('shin-farting');
+
+    activeKids.forEach(kid => {
+      kid.classList.add('panic-mode');
+      const bubble = kid.querySelector('.chat-bubble');
+      bubble.classList.add('panic-bubble');
+      bubble.innerText = funnyPanicQuotes[Math.floor(Math.random() * funnyPanicQuotes.length)];
+      bubble.style.display = 'block';
+    });
+    startMovementLoop(true);
+
+    [0, 1500, 3000].forEach((delay, idx) => {
+      setTimeout(() => {
+        if (!isFartingPhase) return;
+        playAudioEffect('fart');
+        spawnComicBurst(idx % 2 === 0 ? 'BỤP! XỲYYY! 💨' : 'THÚI QUÁ... 🤢');
+        for (let i = 0; i < 45; i++) {
+          setTimeout(() => smokeParticles.push(new Smoke(640, 420)), i * 12);
         }
+      }, delay);
+    });
 
-        function playVictorySound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const notes = [261.6, 329.6, 392.0, 523.3, 659.3];
-            notes.forEach((freq, idx) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 0.5);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + idx * 0.1);
-                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.5);
-            });
-        }
+    setTimeout(() => {
+      const numToFaint = parseInt(document.getElementById('faint-range').value);
+      const chosen = activeKids.sort(() => 0.5 - Math.random()).slice(0, numToFaint);
 
-        // Bán kính Elip
-        function getEllipseRadii() {
-            const maxArenaWidth = Math.min(window.innerWidth - 60, 1300);
-            return {
-                rx: Math.max(maxArenaWidth * 0.44, 450),
-                ry: 180
-            };
-        }
+      banner.innerText = '😵 MÙI THÚI ĐÃ BẮT KỊP CÁC BẠN!';
+      banner.style.background = '#ffccd5';
 
-        // Cập nhật vị trí thẻ lơ lửng trên không trung elip
-        function updateCardsOnEllipse(baseAngle) {
-            const { rx, ry } = getEllipseRadii();
-            const activeIndices = [];
-            rewards.forEach((_, idx) => {
-                if (!eliminatedCards.has(idx) && idx !== currentChosenIndex) {
-                    activeIndices.push(idx);
-                }
-            });
+      chosen.forEach((kid, idx) => {
+        setTimeout(() => {
+          kid.classList.remove('running', 'panic-mode');
+          kid.classList.add('fainted');
+          playAudioEffect('faint');
+          updateCounters();
+        }, idx * 450);
+      });
 
-            activeIndices.forEach((cardIdx, i) => {
-                const el = document.getElementById(`card-wrap-${cardIdx}`);
-                if (!el) return;
-
-                const angle = baseAngle + (i / activeIndices.length) * Math.PI * 2;
-                const cosA = Math.cos(angle);
-                const sinA = Math.sin(angle);
-
-                const x = cosA * rx;
-                const y = sinA * ry;
-
-                const depthFactor = (sinA + 1) / 2;
-                const scale = 0.72 + depthFactor * 0.38;
-                const zIndex = Math.round(50 + depthFactor * 100);
-                const tiltAngle = -cosA * 12;
-
-                el.style.zIndex = zIndex;
-                el.style.opacity = 0.55 + depthFactor * 0.45;
-                el.style.transform = `translate(${x}px, ${y}px) rotate(${tiltAngle}deg) scale(${scale})`;
-            });
-        }
-
-        // Khởi tạo thẻ với linh thú 3D hoạt hình
-        function initCards() {
-            arena.innerHTML = '';
-            rewards.forEach((item, index) => {
-                const animal = animalList[index % animalList.length];
-                const wrapper = document.createElement('div');
-                wrapper.className = 'card-wrapper';
-                wrapper.id = `card-wrap-${index}`;
-
-                wrapper.innerHTML = `
-                    <div class="card-inner">
-                        <!-- Mặt sau: Bé thú 3D Animation -->
-                        <div class="card-face card-back">
-                            <div class="animal-avatar-container">
-                                <div class="animal-halo"></div>
-                                <img src="${animal.img}" alt="${animal.name}" class="animal-img" loading="lazy">
-                            </div>
-                            <div class="animal-name">${animal.name}</div>
-                            <div class="card-label">Thẻ số ${index + 1}</div>
-                        </div>
-
-                        <!-- Mặt trước: Quà tặng Flip 3D -->
-                        <div class="card-face card-front">
-                            <div class="reward-icon">${item.icon}</div>
-                            <div class="reward-title">${item.text}</div>
-                        </div>
-                    </div>
-                `;
-
-                // Vẫn hỗ trợ click tay chọn thẻ tức thì
-                wrapper.onclick = () => {
-                    if (!isAnimating && !eliminatedCards.has(index)) {
-                        pickAndRevealCard(index);
-                    }
-                };
-
-                arena.appendChild(wrapper);
-            });
-
-            updateCardsOnEllipse(currentBaseAngle);
-        }
-
-        // ================= QUAY SHUFFLE & TỰ ĐỘNG CHỌN =================
-        function startShuffleAndAutoPick() {
-            if (isAnimating) return;
-
-            const activeIndices = [];
-            rewards.forEach((_, idx) => {
-                if (!eliminatedCards.has(idx)) activeIndices.push(idx);
-            });
-
-            if (activeIndices.length === 0) {
-                alert("Tất cả thẻ đã được mở hết! Nhấn 'Đặt Lại Trò Chơi' để chơi ván mới nhé.");
-                return;
-            }
-
-            if (activeIndices.length === 1) {
-                pickAndRevealCard(activeIndices[0]);
-                return;
-            }
-
-            isAnimating = true;
-            startBtn.disabled = true;
-
-            const startTime = performance.now();
-            const duration = 2800; // 2.8s
-            const initialAngle = currentBaseAngle;
-            const totalRotation = Math.PI * 6; // 3 vòng
-            let lastAudio = 0;
-
-            function animate(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-
-                // Giảm tốc mượt mà
-                const easeOutProgress = 1 - Math.pow(1 - progress, 3);
-                currentBaseAngle = initialAngle + easeOutProgress * totalRotation;
-
-                if (elapsed - lastAudio > 120 + progress * 160) {
-                    playWhooshSound();
-                    lastAudio = elapsed;
-                }
-
-                updateCardsOnEllipse(currentBaseAngle);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    // Dừng quay: TẤT CẢ THẺ VẪN NẰM NGUYÊN TRÊN ELIP KHÔNG TRUNG
-                    const chosenIndex = activeIndices[Math.floor(Math.random() * activeIndices.length)];
-                    const chosenEl = document.getElementById(`card-wrap-${chosenIndex}`);
-
-                    chosenEl.classList.add('targeted');
-
-                    setTimeout(() => {
-                        chosenEl.classList.remove('targeted');
-                        pickAndRevealCard(chosenIndex);
-                    }, 650);
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        // Tự động Flip thẻ và phóng to
-        function pickAndRevealCard(index) {
-            isAnimating = true;
-            startBtn.disabled = true;
-            currentChosenIndex = index;
-
-            const el = document.getElementById(`card-wrap-${index}`);
-
-            el.classList.add('focus-center');
-            playFlipSound();
-
-            setTimeout(() => {
-                el.classList.add('flipped');
-                playVictorySound();
-
-                confetti({
-                    particleCount: 100,
-                    spread: 90,
-                    origin: { y: 0.55 }
-                });
-
-                setTimeout(() => {
-                    document.getElementById('rewardEmoji').innerText = rewards[index].icon;
-                    document.getElementById('rewardText').innerText = rewards[index].text;
-                    document.getElementById('rewardModal').classList.add('active');
-                }, 800);
-            }, 300);
-        }
-
-        // Đóng quà và tự động Eliminate thẻ vừa mở
-        function closeReward() {
-            document.getElementById('rewardModal').classList.remove('active');
-
-            if (currentChosenIndex !== null) {
-                const el = document.getElementById(`card-wrap-${currentChosenIndex}`);
-                if (el) {
-                    el.classList.remove('focus-center');
-                    el.classList.add('eliminated');
-                    eliminatedCards.add(currentChosenIndex);
-                }
-                currentChosenIndex = null;
-            }
-
-            // Chia đều lại các thẻ còn lại trên elip
-            updateCardsOnEllipse(currentBaseAngle);
-
-            isAnimating = false;
-            startBtn.disabled = false;
-        }
-
-        // Đặt lại game
-        function resetGame() {
-            if (isAnimating) return;
-            eliminatedCards.clear();
-            currentChosenIndex = null;
-            currentBaseAngle = 0;
-
-            document.querySelectorAll('.card-wrapper').forEach(el => {
-                el.className = 'card-wrapper';
-                el.style.opacity = 1;
-            });
-
-            updateCardsOnEllipse(currentBaseAngle);
-            startShuffleAndAutoPick();
-        }
-
-        // ================= CÀI ĐẶT PHẦN THƯỞNG =================
-        function openConfigModal() {
-            const listContainer = document.getElementById('configList');
-            listContainer.innerHTML = '';
-
-            rewards.forEach((item, idx) => {
-                const row = document.createElement('div');
-                row.className = 'config-item';
-                row.innerHTML = `
-                    <input type="text" class="icon-input" id="cfg-icon-${idx}" value="${item.icon}" maxlength="3">
-                    <input type="text" class="text-input" id="cfg-text-${idx}" value="${item.text}">
-                `;
-                listContainer.appendChild(row);
-            });
-
-            document.getElementById('configModal').classList.add('active');
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.remove('active');
-        }
-
-        function saveConfig() {
-            rewards.forEach((_, idx) => {
-                const iconVal = document.getElementById(`cfg-icon-${idx}`).value.trim();
-                const textVal = document.getElementById(`cfg-text-${idx}`).value.trim();
-                rewards[idx] = {
-                    icon: iconVal || "🎁",
-                    text: textVal || `Phần thưởng ${idx + 1}`
-                };
-            });
-
-            localStorage.setItem('classroom_rewards', JSON.stringify(rewards));
-            closeConfigModal();
-            initCards();
-            resetGame();
-        }
-
-        window.addEventListener('resize', () => {
-            if (!isAnimating) {
-                updateCardsOnEllipse(currentBaseAngle);
-            }
+      setTimeout(() => {
+        isFartingPhase = false;
+        shinImg.classList.remove('shin-farting');
+        document.querySelectorAll('.student-item.running').forEach(k => {
+          k.classList.remove('panic-mode');
+          k.querySelector('.chat-bubble').style.display = 'none';
         });
+        startMovementLoop(false);
+        mainBtn.disabled = false; mainBtn.innerText = '💨 SHIN XÌ HƠI TIẾP! 🤢';
+      }, chosen.length * 450 + 600);
 
-        // Khởi tạo
-        initCards();
-    </script>
+    }, 4500);
+  }
+
+  function updateCounters() {
+    document.getElementById('count-playing').innerText = document.querySelectorAll('.student-item.running').length;
+    document.getElementById('count-fainted').innerText = document.querySelectorAll('.student-item.fainted').length;
+  }
+
+  function initializeStudents() {
+    document.querySelectorAll('.student-item').forEach(e => e.remove());
+    const names = document.getElementById('student-names-input').value.split('\n').filter(n => n.trim() !== '');
+
+    names.forEach((name, i) => {
+      const kid = document.createElement('div');
+      kid.className = 'student-item running';
+
+      kid.innerHTML = `
+        <div class="chat-bubble" style="display:none;"></div>
+        <div class="student-box-div">
+          ${name}
+          <div class="hypno-overlay">😵‍💫</div>
+        </div>
+        <div class="student-tag">${name}</div>
+      `;
+
+      let x = Math.random() * 800 + 40;
+      let y = Math.random() * 150 + 105;
+      if (x > 520 && x < 740) x = 450;
+      kid.style.left = x + 'px'; kid.style.bottom = y + 'px';
+
+      roomStage.appendChild(kid);
+    });
+    updateCounters();
+    startMovementLoop(false);
+  }
+
+  function resetGameStage() {
+    isFartingPhase = false;
+    banner.innerText = '🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!';
+    banner.style.background = '#fff8bd';
+    mainBtn.disabled = false; mainBtn.innerText = '💨 SHIN XÌ HƠI! 🤢';
+    document.getElementById('shin-img').classList.remove('shin-farting');
+    initializeStudents();
+  }
+
+  function openStudentModal() { document.getElementById('name-modal').style.display = 'flex'; }
+  function saveStudentNames() { document.getElementById('name-modal').style.display = 'none'; resetGameStage(); }
+
+  window.onload = initializeStudents;
+</script>
+
 </body>
 </html>
