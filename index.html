@@ -1,1039 +1,922 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ĐẠI TIỆC SHIN XÌ HƠI! - PAJAMA PARTY</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Mali:wght@700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ĐẠI TIỆC SHIN XÌ HƠI! - GỌI TÊN HỌC SINH</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Mali:wght@700&display=swap');
 
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            margin: 0;
-            padding: 0;
-        }
+  * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
 
-        body {
-            background: #1e1e24;
-            font-family: 'Comfortaa', cursive, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+  body {
+    background: #1b1d24;
+    font-family: 'Comfortaa', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-        /* Khung Game chuẩn tỉ lệ 16:9 giống ảnh đính kèm */
-        #game-container {
-            width: 1024px;
-            height: 576px;
-            background: #bbf2be; /* Tông màu xanh nhạt của nền gốc */
-            border: 8px solid #4a2c11;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 12px 36px rgba(0,0,0,0.6);
-        }
+  /* Khung chứa game tỉ lệ chuẩn 16:9 */
+  #game-app {
+    width: 1040px;
+    height: 585px;
+    background: #d8f5d3;
+    border: 8px solid #4a3427;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  }
 
-        /* Nền canvas chính vẽ nhân vật & hiệu ứng mượt mà */
-        #game-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-        }
+  /* Thanh tiêu đề trên cùng */
+  .header-bar {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 75px;
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 4px solid #ffccd5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 50;
+  }
+  .header-title-box h1 {
+    font-size: 22px;
+    color: #e63946;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-title-box p {
+    font-size: 11px;
+    color: #666;
+  }
+  .header-badges {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .badge {
+    background: #fff;
+    border: 2px solid #ffb3c1;
+    border-radius: 14px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #4a3427;
+    box-shadow: 0 3px 0 #ffccd5;
+  }
+  .badge b { color: #d90429; font-size: 15px; }
 
-        /* Lớp nền tĩnh (Cửa sổ, bể cá, lều, trang trí) */
-        .game-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: #d8f5d3;
-            z-index: 1;
-        }
+  .btn-ui {
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+  }
 
-        /* Cửa sổ ban đêm có rèm hồng và trăng */
-        .custom-window {
-            position: absolute;
-            top: 55px;
-            left: 130px;
-            width: 220px;
-            height: 180px;
-            background: #14163c;
-            border: 10px solid #ffa5be;
-            border-bottom: 16px solid #ffa5be;
-            border-radius: 20px 20px 0 0;
-            z-index: 2;
-        }
-        .custom-window::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 0; width: 100%; height: 6px; background: #ffa5be;
-            transform: translateY(-50%);
-        }
-        .custom-window::after {
-            content: '';
-            position: absolute;
-            left: 50%; top: 0; width: 6px; height: 100%; background: #ffa5be;
-            transform: translateX(-50%);
-        }
-        .moon {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            box-shadow: 10px 10px 0 0 #fbe25d;
-        }
+  /* Băng rôn trạng thái */
+  .status-banner {
+    position: absolute;
+    top: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff8bd;
+    border: 3px solid #f4a261;
+    border-radius: 30px;
+    padding: 6px 30px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a2800;
+    box-shadow: 0 4px 0 #e76f51;
+    z-index: 40;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
 
-        /* Bể cá cảnh bên trái */
-        .aquarium-box {
-            position: absolute;
-            bottom: 120px;
-            left: 30px;
-            width: 150px;
-            height: 100px;
-            background: linear-gradient(180deg, rgba(142, 212, 255, 0.8) 0%, rgba(48, 152, 218, 0.9) 100%);
-            border: 5px solid #dcdcdc;
-            border-radius: 12px;
-            z-index: 3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 22px;
-        }
+  /* Phòng ngủ & cảnh vật trang trí */
+  .room-window {
+    position: absolute;
+    top: 90px;
+    left: 120px;
+    width: 210px;
+    height: 180px;
+    background: #141738;
+    border: 10px solid #ffb5c5;
+    border-bottom: 16px solid #ffb5c5;
+    border-radius: 20px 20px 0 0;
+    z-index: 2;
+  }
+  .room-window::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; width: 100%; height: 6px; background: #ffb5c5;
+    transform: translateY(-50%);
+  }
+  .room-window::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 0; width: 6px; height: 100%; background: #ffb5c5;
+    transform: translateX(-50%);
+  }
+  .window-moon {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    box-shadow: 10px 10px 0 0 #ffeb3b;
+  }
 
-        /* Lều cắm trại Pijama ngủ */
-        .cozy-tent {
-            position: absolute;
-            bottom: 100px;
-            right: 25px;
-            width: 150px;
-            height: 180px;
-            background: #fbd068;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            border-left: 12px solid #e1aa2c;
-            z-index: 3;
-        }
-        .cozy-tent::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 45px;
-            width: 45px;
-            height: 65px;
-            background: #623e14;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        }
+  .aquarium {
+    position: absolute;
+    bottom: 130px;
+    left: 40px;
+    width: 160px;
+    height: 100px;
+    background: linear-gradient(180deg, rgba(162, 222, 255, 0.8) 0%, rgba(68, 172, 238, 0.9) 100%);
+    border: 5px solid #dcdcdc;
+    border-radius: 12px;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+  }
 
-        /* UI TRÊN CÙNG */
-        .game-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 72px;
-            background: rgba(255, 255, 255, 0.96);
-            border-bottom: 4px solid #ffcbd5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            z-index: 50;
-        }
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .header-title h1 {
-            font-size: 23px;
-            color: #d62246;
-            font-family: 'Comfortaa', sans-serif;
-            text-shadow: 1px 1px 0px #ffe5ec;
-        }
-        .header-title p {
-            font-size: 11px;
-            color: #666;
-        }
-        .header-stats {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .badge {
-            background: #fff;
-            border: 2px solid #ffccd5;
-            border-radius: 12px;
-            padding: 4px 12px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #4a3427;
-        }
-        .badge span {
-            color: #d62246;
-            font-size: 14px;
-        }
-        .btn-config {
-            background: #4caf50;
-            color: #fff;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .sound-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-        }
+  .tent-shelter {
+    position: absolute;
+    bottom: 110px;
+    right: 30px;
+    width: 140px;
+    height: 170px;
+    background: #f7d070;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    border-left: 12px solid #dfa838;
+    z-index: 3;
+  }
+  .tent-door {
+    position: absolute;
+    bottom: 0;
+    left: 45px;
+    width: 50px;
+    height: 65px;
+    background: #6e4719;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
 
-        /* BĂNG RÔN THÔNG BÁO Ở GIỮA GIỐNG ẢNH MẪU */
-        .alert-banner {
-            position: absolute;
-            top: 82px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #e2f7cb;
-            border: 2px solid #a3cf62;
-            border-radius: 30px;
-            padding: 6px 36px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #2b540f;
-            box-shadow: 0 3px 0 #a3cf62;
-            z-index: 40;
-            transition: background 0.3s, color 0.3s;
-        }
+  /* Sân khấu nhân vật */
+  .room-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
 
-        /* UI DƯỚI CÙNG VÀ NÚT BẤM CHÍNH */
-        .game-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: #ffffff;
-            border-top: 4px solid #ffccd5;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 10px 24px;
-            z-index: 50;
-        }
-        .slider-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #4a3427;
-        }
-        .slider-control input[type="range"] {
-            accent-color: #f72585;
-        }
-        .qty-badge {
-            background: #fff;
-            border: 2px solid #f72585;
-            color: #d62246;
-            padding: 2px 10px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .action-btn {
-            background: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
-            color: white;
-            border: none;
-            padding: 12px 40px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 25px;
-            box-shadow: 0 5px 0 #7209b7;
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-        .action-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #7209b7;
-        }
-        .restart-btn {
-            background: #fdfdfd;
-            border: 2px solid #ccc;
-            border-radius: 12px;
-            padding: 6px 14px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #555;
-        }
+  /* Canvas khói xì hơi */
+  #smoke-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+  }
 
-        /* POPUP SỬA TÊN */
-        .modal {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 100;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-body {
-            background: white;
-            padding: 20px;
-            border-radius: 18px;
-            width: 400px;
-            text-align: center;
-            border: 5px solid #4a3427;
-        }
-        textarea {
-            width: 100%;
-            height: 140px;
-            margin: 12px 0;
-            padding: 10px;
-            font-family: inherit;
-        }
-    </style>
+  /* Shin Cậu Bé Bút Chì */
+  .shin-wrapper {
+    position: absolute;
+    bottom: 130px;
+    left: 640px;
+    width: 130px;
+    height: 150px;
+    z-index: 20;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .shin-tag {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffeb3b;
+    border: 2px solid #5d4037;
+    border-radius: 10px;
+    padding: 2px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #4e342e;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 #5d4037;
+  }
+
+  /* Hoạt ảnh Shin chổng mông rung lắc xì hơi */
+  @keyframes shinFartShake {
+    0% { transform: scale(1) rotate(0deg); }
+    20% { transform: scale(1.15) rotate(-6deg) translateX(-10px); }
+    40% { transform: scale(1.2) rotate(6deg) translateX(10px); }
+    60% { transform: scale(1.15) rotate(-4deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .shin-farting {
+    animation: shinFartShake 0.6s ease-in-out;
+  }
+
+  /* Chữ hoạt hình BỤP! XỲYYY! */
+  .fart-comic-text {
+    position: absolute;
+    bottom: 230px;
+    left: 620px;
+    font-family: 'Mali', cursive;
+    font-size: 38px;
+    font-weight: 900;
+    color: #38b000;
+    text-shadow: 3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 0 #1b4332;
+    z-index: 60;
+    pointer-events: none;
+    animation: comicPop 0.8s forwards ease-out;
+    white-space: nowrap;
+  }
+  @keyframes comicPop {
+    0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg) translateY(-30px); opacity: 0; }
+  }
+
+  /* Học sinh chạy trốn & ngất xỉu */
+  .student-item {
+    position: absolute;
+    width: 90px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    transition: left 0.7s cubic-bezier(0.25, 1, 0.5, 1), bottom 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 18;
+    pointer-events: auto;
+  }
+
+  /* Hoạt ảnh chân tay khua khoắng hoảng loạn */
+  @keyframes runPanic {
+    0% { transform: translateY(0) rotate(-8deg); }
+    50% { transform: translateY(-12px) rotate(8deg) scaleY(1.05); }
+    100% { transform: translateY(0) rotate(-8deg); }
+  }
+  .student-item.running .char-svg {
+    animation: runPanic 0.28s infinite ease-in-out;
+  }
+
+  /* Ngất xỉu nằm bẹp ra đất */
+  .student-item.fainted {
+    transform: rotate(85deg) translateY(20px) !important;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 12 !important;
+  }
+  .student-item.fainted .char-svg {
+    animation: none !important;
+    filter: drop-shadow(0 0 8px rgba(118, 186, 0, 0.6));
+  }
+
+  .student-tag {
+    background: #fff;
+    border: 2px solid #4a3427;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    margin-top: 3px;
+    box-shadow: 0 2px 0 #4a3427;
+  }
+  .student-item.fainted .student-tag {
+    background: #ffd6d6;
+    border-color: #c9184a;
+    color: #c9184a;
+  }
+
+  /* Bóng thoại kêu la */
+  .chat-bubble {
+    position: absolute;
+    top: -26px;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-size: 9px;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    z-index: 30;
+  }
+  .chat-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px 5px 0;
+    border-style: solid;
+    border-color: #fff transparent;
+  }
+
+  /* Vòng xoáy thôi miên liên tục xoay */
+  @keyframes hypnoSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .hypno-eye {
+    transform-origin: center;
+    animation: hypnoSpin 0.5s infinite linear;
+  }
+
+  /* Thanh điều khiển dưới cùng */
+  .footer-bar {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 85px;
+    background: #fff;
+    border-top: 4px solid #ffccd5;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 24px;
+    z-index: 50;
+  }
+  .slider-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a3427;
+  }
+  .slider-num {
+    background: #fff0f3;
+    border: 2px solid #ff4d6d;
+    color: #c9184a;
+    padding: 3px 12px;
+    border-radius: 8px;
+    font-size: 18px;
+    min-width: 38px;
+    text-align: center;
+  }
+
+  .btn-fart-action {
+    background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+    color: white;
+    border: none;
+    padding: 14px 44px;
+    font-size: 17px;
+    font-weight: bold;
+    border-radius: 30px;
+    box-shadow: 0 6px 0 #800f2f;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.1s;
+  }
+  .btn-fart-action:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #800f2f;
+  }
+
+  /* Popup cài đặt danh sách */
+  .modal-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65);
+    z-index: 100;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 20px;
+    width: 440px;
+    text-align: center;
+    border: 5px solid #4a3427;
+  }
+  .modal-box textarea {
+    width: 100%;
+    height: 160px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    font-family: inherit;
+    margin: 12px 0;
+  }
+</style>
 </head>
 <body>
 
-<div id="game-container">
-    <div class="game-bg"></div>
-    <div class="custom-window"><div class="moon"></div></div>
-    <div class="aquarium-box">🐠 🌿</div>
-    <div class="cozy-tent"></div>
+<div id="game-app">
+  <!-- Cảnh nền -->
+  <div class="room-window"><div class="window-moon"></div></div>
+  <div class="aquarium">🐠 🌿</div>
+  <div class="tent-shelter"><div class="tent-door"></div></div>
 
-    <!-- UI Trên -->
-    <div class="game-header">
-        <div class="header-title">
-            <span>🎉</span>
-            <div>
-                <h1>ĐẠI TIỆC SHIN XÌ HƠI!</h1>
-                <p>Nằm pijama ăn bánh mà Shin xì hơi là các bạn ngất bẹp!</p>
-            </div>
-            <button class="btn-config" onclick="togglePopup(true)">📝 Đổi Tên Học Sinh</button>
-        </div>
-        <div class="header-stats">
-            <div class="badge">ĐANG CHƠI: <span id="playing-cnt">10</span></div>
-            <div class="badge">ĐÃ XỈU: <span id="fainted-cnt">0</span></div>
-            <button class="sound-btn" onclick="switchAudio()" id="sound-icon">🔊</button>
-        </div>
+  <!-- Header -->
+  <div class="header-bar">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 32px;">🎁</span>
+      <div class="header-title-box">
+        <h1>ĐẠI TIỆC SHIN XÌ HƠI! 💨</h1>
+        <p>Shin rủ cả lớp ăn bánh... nhưng chuyện gì sẽ xảy ra?</p>
+      </div>
+      <button class="btn-ui" onclick="openStudentModal()" style="margin-left: 10px; color: #2b9348;">📝 Đổi tên HS</button>
+    </div>
+    <div class="header-badges">
+      <div class="badge">ĐANG CHƠI: <b id="count-playing">10</b></div>
+      <div class="badge">ĐÃ XỈU: <b id="count-fainted">0</b></div>
+      <button class="btn-ui" onclick="toggleAudio()" id="btn-sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- Băng rôn trạng thái -->
+  <div class="status-banner" id="status-banner">
+    🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!
+  </div>
+
+  <!-- Màn khói canvas -->
+  <canvas id="smoke-canvas"></canvas>
+
+  <!-- Sân khấu chính chứa nhân vật -->
+  <div class="room-stage" id="room-stage">
+
+    <!-- CẬU BÉ SHIN BÚT CHÌ (Có 2 trạng thái: Ăn bánh & Tuột quần chổng mông xì hơi) -->
+    <div class="shin-wrapper" id="shin-boy" onclick="triggerFartEvent()">
+      <!-- Trạng thái 1: Đứng ăn bánh bình yên -->
+      <svg id="shin-stand" viewBox="0 0 100 120" width="100%" height="100%">
+        <path d="M 40,96 L 36,110" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="34" cy="113" rx="8" ry="4" fill="#ffeb3b" stroke="#333" stroke-width="2"/>
+        <path d="M 60,96 L 64,110" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="66" cy="113" rx="8" ry="4" fill="#ffeb3b" stroke="#333" stroke-width="2"/>
+        <path d="M 32,78 L 68,78 L 74,96 L 54,96 L 50,88 L 46,96 L 26,96 Z" fill="#ffeb3b" stroke="#333" stroke-width="2.5"/>
+        <path d="M 30,55 Q 50,52 70,55 L 75,80 L 25,80 Z" fill="#e53935" stroke="#333" stroke-width="2.5"/>
+        <path d="M 30,55 L 20,66 L 27,72 L 32,64 Z" fill="#e53935" stroke="#333" stroke-width="2"/>
+        <path d="M 70,55 L 80,66 L 73,72 L 68,64 Z" fill="#e53935" stroke="#333" stroke-width="2"/>
+        <!-- Đầu hạt đậu má phính Shin-chan -->
+        <path d="M 28,40 C 14,42 16,58 28,60 C 40,62 52,62 72,58 C 84,55 86,38 72,35 C 64,26 38,26 28,40 Z" fill="#ffcc80" stroke="#333" stroke-width="3"/>
+        <ellipse cx="80" cy="46" rx="4" ry="6" fill="#ffcc80" stroke="#333" stroke-width="2"/>
+        <path d="M 28,38 Q 40,26 65,30 Q 72,32 74,38 Q 62,31 40,32 Q 30,34 28,38 Z" fill="#212121"/>
+        <path d="M 32,35 Q 40,28 48,34" stroke="#212121" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <path d="M 56,33 Q 64,28 72,35" stroke="#212121" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="42" cy="42" rx="4" ry="5.5" fill="#212121"/><circle cx="44" cy="40" r="1.5" fill="#fff"/>
+        <ellipse cx="64" cy="41" rx="4" ry="5.5" fill="#212121"/><circle cx="66" cy="39" r="1.5" fill="#fff"/>
+        <ellipse cx="53" cy="53" rx="3" ry="4.5" fill="#c62828" stroke="#333" stroke-width="1.5"/>
+        <!-- Đĩa bánh trên tay -->
+        <ellipse cx="84" cy="70" rx="12" ry="4" fill="#fff" stroke="#333" stroke-width="1.5"/>
+        <circle cx="84" cy="67" r="5" fill="#795548"/>
+      </svg>
+
+      <!-- Trạng thái 2: Tuột quần chổng mông thả rắm (Ẩn lúc đầu) -->
+      <svg id="shin-fart" viewBox="0 0 120 120" width="100%" height="100%" style="display:none;">
+        <ellipse cx="38" cy="115" rx="12" ry="6" fill="#fbc02d" stroke="#333" stroke-width="2.5"/>
+        <ellipse cx="68" cy="115" rx="12" ry="6" fill="#fbc02d" stroke="#333" stroke-width="2.5"/>
+        <path d="M 30,96 C 30,112 75,112 75,96 Z" fill="#ffeb3b" stroke="#333" stroke-width="2.5"/>
+        <!-- Mông chổng ra trái -->
+        <path d="M 22,82 C 10,82 8,96 18,102 C 25,106 32,98 32,88 Z" fill="#ffcc80" stroke="#333" stroke-width="2.5"/>
+        <path d="M 18,90 C 13,90 12,96 17,98 Z" fill="#ff8a65"/>
+        <path d="M 32,74 Q 40,64 54,68 Q 72,72 74,90 Q 70,105 45,100" fill="#e53935" stroke="#333" stroke-width="2.5"/>
+        <!-- Đầu quay lại cười ranh mãnh -->
+        <path d="M 45,40 C 35,40 32,55 42,65 Q 52,70 65,65 C 78,55 75,38 60,35 C 54,32 48,35 45,40 Z" fill="#ffcc80" stroke="#333" stroke-width="3"/>
+        <ellipse cx="73" cy="54" rx="5" ry="7" fill="#ffcc80" stroke="#333" stroke-width="2"/>
+        <path d="M 40,36 Q 48,30 58,32 Q 52,28 40,36" fill="#212121"/>
+        <path d="M 42,43 Q 48,39 52,43" stroke="#212121" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <path d="M 58,41 Q 64,39 68,43" stroke="#212121" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="48" cy="48" rx="3.5" ry="2" fill="#212121"/>
+        <ellipse cx="64" cy="48" rx="3.5" ry="2" fill="#212121"/>
+        <path d="M 52,58 Q 58,62 62,56" stroke="#333" stroke-width="2" fill="none"/>
+      </svg>
+
+      <div class="shin-tag">SHIN 🍮</div>
     </div>
 
-    <!-- Banner vàng-xanh chuẩn -->
-    <div class="alert-banner" id="banner">🎂 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!</div>
+  </div>
 
-    <!-- Canvas Vẽ mượt các chuyển động vật lý, nhân vật hoạt hình -->
-    <canvas id="game-canvas"></canvas>
-
-    <!-- UI Dưới -->
-    <div class="game-footer">
-        <div class="slider-control">
-            <span>SỐ BẠN BỊ NGẤT MỖI LƯỢT:</span>
-            <input type="range" id="faint-slider" min="1" max="5" value="3" oninput="document.getElementById('slider-qty').innerText = this.value">
-            <span class="qty-badge" id="slider-qty">3</span>
-        </div>
-
-        <button class="action-btn" id="action-btn" onclick="startFart()">
-            🧁 SHIN XÌ HƠI! 🤢
-        </button>
-
-        <button class="restart-btn" onclick="resetAll()">🔄 Gọi lại từ đầu</button>
+  <!-- Điều khiển dưới cùng -->
+  <div class="footer-bar">
+    <div class="slider-box">
+      <span>SỐ BẠN NGẤT MỖI LƯỢT:</span>
+      <input type="range" id="faint-range" min="1" max="5" value="3" oninput="document.getElementById('num-preview').innerText = this.value">
+      <span class="slider-num" id="num-preview">3</span>
     </div>
+
+    <button class="btn-fart-action" id="btn-main-action" onclick="triggerFartEvent()">
+      💨 SHIN XÌ HƠI! 🤢
+    </button>
+
+    <button class="btn-ui" onclick="resetGameStage()">🔄 Gọi lại từ đầu</button>
+  </div>
 </div>
 
-<!-- Modal Đổi tên -->
-<div class="modal" id="popup">
-    <div class="modal-body">
-        <h3 style="color: #b5179e;">Cập Nhật Thành Viên</h3>
-        <p style="font-size: 12px; color: #666; margin-top: 5px;">Nhập tên học sinh (mỗi dòng một bạn):</p>
-        <textarea id="names-input">Vy
+<!-- Modal đổi tên học sinh -->
+<div class="modal-overlay" id="name-modal">
+  <div class="modal-box">
+    <h3 style="color: #c9184a;">Danh Sách Học Sinh Trong Lớp</h3>
+    <p style="font-size: 13px; color: #666; margin-top: 5px;">Nhập tên học sinh (mỗi bạn một dòng):</p>
+    <textarea id="student-names-input">Kazama
+Masao
+Nene
+Bo-chan
 Hoàng Minh Châu
 Tạ Gia Hân
 Phan Đức Phúc
-Hoàng Ngân
 Trịnh Thùy Linh
 Vũ Hoàng Long
-Kaon, Masao
-Ngọc Diệp
-Hồng Đạt</textarea>
-        <br>
-        <button class="action-btn" style="font-size:13px; padding: 10px 20px;" onclick="saveNames()">Xong nà!</button>
-    </div>
+Phạm Tiến Đạt</textarea>
+    <br>
+    <button class="btn-fart-action" style="padding: 10px 24px; font-size: 14px; margin: 0 auto;" onclick="saveStudentNames()">Lưu & Bắt Đầu</button>
+  </div>
 </div>
 
 <script>
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    const alertBanner = document.getElementById('banner');
-    const actBtn = document.getElementById('action-btn');
+  let soundEnabled = true;
+  let students = [];
+  const roomStage = document.getElementById('room-stage');
+  const canvas = document.getElementById('smoke-canvas');
+  const ctx = canvas.getContext('2d');
+  const banner = document.getElementById('status-banner');
+  const mainBtn = document.getElementById('btn-main-action');
 
-    let audioEnabled = true;
-    let students = [];
-    let state = 'peaceful'; // 'peaceful', 'farting', 'panicking'
-    let isTransitioningToFart = false; // Phase check
+  function resizeCanvas() {
+    canvas.width = 1040;
+    canvas.height = 585;
+  }
+  resizeCanvas();
 
-    // Đặt lại kích thước canvas
-    function initCanvasSize() {
-        canvas.width = 1024;
-        canvas.height = 576;
+  /* ==============================================================
+     BỘ MẪU 4 NHÂN VẬT CHUẨN CỦA BỘ PHIM (KAZAMA, MASAO, NENE, BO-CHAN)
+  ============================================================== */
+  const studentTemplates = [
+    // 1. KAZAMA (Tóc vuốt xanh nhọn, áo xanh ngọc, quần cam)
+    {
+      eyeLPos: { x: 42, y: 43 },
+      eyeRPos: { x: 60, y: 43 },
+      svg: `
+      <svg class="char-svg" viewBox="0 0 100 120" width="100%" height="100%">
+        <path d="M 40,98 L 38,111" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="36" cy="113" rx="7" ry="3.5" fill="#1a237e" stroke="#333" stroke-width="2"/>
+        <path d="M 60,98 L 62,111" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="64" cy="113" rx="7" ry="3.5" fill="#1a237e" stroke="#333" stroke-width="2"/>
+        <path d="M 33,80 L 67,80 L 72,98 L 53,98 L 50,91 L 47,98 L 28,98 Z" fill="#ff6f00" stroke="#333" stroke-width="2.5"/>
+        <path d="M 30,58 L 70,58 L 73,82 L 27,82 Z" fill="#29b6f6" stroke="#333" stroke-width="2.5"/>
+        <polygon points="40,58 50,67 47,58" fill="#ffffff" stroke="#333" stroke-width="1.5"/>
+        <polygon points="60,58 50,67 53,58" fill="#ffffff" stroke="#333" stroke-width="1.5"/>
+        <path d="M 28,62 L 18,74" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 72,62 L 82,74" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 30,42 C 20,44 22,58 32,60 C 44,62 58,62 70,58 C 80,54 80,42 70,38 C 62,32 40,32 30,42 Z" fill="#ffcc80" stroke="#333" stroke-width="2.5"/>
+        <ellipse cx="76" cy="48" rx="3.5" ry="5.5" fill="#ffcc80" stroke="#333" stroke-width="2"/>
+        <path d="M 28,42 Q 22,25 36,24 Q 28,12 50,14 Q 72,15 68,36 Z" fill="#1a237e" stroke="#333" stroke-width="2.5"/>
+        <path d="M 36,36 Q 42,32 46,36" stroke="#333" stroke-width="2" fill="none"/>
+        <path d="M 54,36 Q 58,32 64,36" stroke="#333" stroke-width="2" fill="none"/>
+        <ellipse class="eye-l" cx="42" cy="43" rx="4" ry="5" fill="#212121"/>
+        <ellipse class="eye-r" cx="60" cy="43" rx="4" ry="5" fill="#212121"/>
+        <path d="M 48,52 Q 52,56 56,52" stroke="#333" stroke-width="2" fill="none"/>
+      </svg>`
+    },
+    // 2. MASAO (Đầu đinh củ hành, áo xanh lá, quần xanh lam)
+    {
+      eyeLPos: { x: 38, y: 39 },
+      eyeRPos: { x: 62, y: 39 },
+      svg: `
+      <svg class="char-svg" viewBox="0 0 100 120" width="100%" height="100%">
+        <path d="M 40,96 L 38,110" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="36" cy="112" rx="7" ry="3.5" fill="#4caf50" stroke="#333" stroke-width="2"/>
+        <path d="M 60,96 L 62,110" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="64" cy="112" rx="7" ry="3.5" fill="#4caf50" stroke="#333" stroke-width="2"/>
+        <path d="M 33,78 L 67,78 L 71,96 L 53,96 L 50,89 L 47,96 L 29,96 Z" fill="#1e88e5" stroke="#333" stroke-width="2.5"/>
+        <path d="M 28,58 L 72,58 L 75,80 L 25,80 Z" fill="#7cb342" stroke="#333" stroke-width="2.5"/>
+        <path d="M 26,64 Q 38,72 44,68" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 74,64 Q 62,72 56,68" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="40" rx="24" ry="22" fill="#ffcc80" stroke="#333" stroke-width="2.5"/>
+        <path d="M 26,38 C 26,20 74,20 74,38 C 66,24 34,24 26,38 Z" fill="#b0bec5" opacity="0.6"/>
+        <circle cx="25" cy="42" r="4.5" fill="#ffcc80" stroke="#333" stroke-width="2"/>
+        <circle cx="75" cy="42" r="4.5" fill="#ffcc80" stroke="#333" stroke-width="2"/>
+        <path d="M 34,31 Q 38,28 42,32" stroke="#333" stroke-width="2" fill="none"/>
+        <path d="M 58,32 Q 62,28 66,31" stroke="#333" stroke-width="2" fill="none"/>
+        <ellipse class="eye-l" cx="38" cy="39" rx="3.5" ry="4.5" fill="#212121"/>
+        <ellipse class="eye-r" cx="62" cy="39" rx="3.5" ry="4.5" fill="#212121"/>
+        <path d="M 30,46 L 34,44 M 66,46 L 70,44" stroke="#ef5350" stroke-width="1.5"/>
+        <path d="M 43,51 Q 50,46 57,51" stroke="#333" stroke-width="2.2" fill="none"/>
+      </svg>`
+    },
+    // 3. NENE (Váy hồng cổ trắng, bím tóc nâu đỏ 2 bên, giày đỏ)
+    {
+      eyeLPos: { x: 42, y: 43 },
+      eyeRPos: { x: 58, y: 43 },
+      svg: `
+      <svg class="char-svg" viewBox="0 0 100 120" width="100%" height="100%">
+        <path d="M 42,98 L 40,111" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="38" cy="113" rx="6.5" ry="3.5" fill="#d32f2f" stroke="#333" stroke-width="2"/>
+        <path d="M 58,98 L 60,111" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="62" cy="113" rx="6.5" ry="3.5" fill="#d32f2f" stroke="#333" stroke-width="2"/>
+        <path d="M 36,60 L 64,60 L 73,98 L 27,98 Z" fill="#f48fb1" stroke="#333" stroke-width="2.5"/>
+        <polygon points="42,60 50,67 47,60" fill="#ffffff" stroke="#333" stroke-width="1.5"/>
+        <polygon points="58,60 50,67 53,60" fill="#ffffff" stroke="#333" stroke-width="1.5"/>
+        <path d="M 32,64 Q 18,54 16,66" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 68,64 Q 82,54 84,66" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="20" cy="38" r="8" fill="#8d4925" stroke="#333" stroke-width="2"/>
+        <circle cx="17" cy="44" r="3" fill="#26a69a"/>
+        <circle cx="80" cy="38" r="8" fill="#8d4925" stroke="#333" stroke-width="2"/>
+        <circle cx="83" cy="44" r="3" fill="#26a69a"/>
+        <ellipse cx="50" cy="44" rx="22" ry="18" fill="#ffcc80" stroke="#333" stroke-width="2.5"/>
+        <path d="M 28,38 Q 50,22 72,38 Q 62,30 50,30 Q 38,30 28,38 Z" fill="#8d4925"/>
+        <path d="M 37,35 Q 42,31 46,35" stroke="#333" stroke-width="1.8" fill="none"/>
+        <path d="M 54,35 Q 58,31 63,35" stroke="#333" stroke-width="1.8" fill="none"/>
+        <ellipse class="eye-l" cx="42" cy="43" rx="4" ry="5.5" fill="#212121"/>
+        <ellipse class="eye-r" cx="58" cy="43" rx="4" ry="5.5" fill="#212121"/>
+        <path d="M 46,52 Q 50,56 54,52" stroke="#d81b60" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>`
+    },
+    // 4. BO-CHAN (Đầu trái lê, giọt nước mũi dài, áo vàng, quần xanh rêu)
+    {
+      eyeLPos: { x: 42, y: 42 },
+      eyeRPos: { x: 58, y: 42 },
+      svg: `
+      <svg class="char-svg" viewBox="0 0 100 130" width="100%" height="100%">
+        <path d="M 40,104 L 38,118" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="36" cy="120" rx="7" ry="3.5" fill="#388e3c" stroke="#333" stroke-width="2"/>
+        <path d="M 60,104 L 62,118" stroke="#333" stroke-width="3" fill="none"/>
+        <ellipse cx="64" cy="120" rx="7" ry="3.5" fill="#388e3c" stroke="#333" stroke-width="2"/>
+        <path d="M 33,86 L 67,86 L 71,104 L 53,104 L 50,97 L 47,104 L 29,104 Z" fill="#2e7d32" stroke="#333" stroke-width="2.5"/>
+        <path d="M 28,64 L 72,64 L 75,88 L 25,88 Z" fill="#fff59d" stroke="#333" stroke-width="2.5"/>
+        <path d="M 27,68 L 18,80" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 73,68 L 82,80" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 34,30 C 30,16 70,16 66,30 C 76,46 76,64 50,65 C 24,64 24,46 34,30 Z" fill="#ffcc80" stroke="#333" stroke-width="2.5"/>
+        <path d="M 35,26 L 40,18 L 45,26 L 50,17 L 55,26 L 60,18 L 65,26 Z" fill="#212121"/>
+        <ellipse class="eye-l" cx="42" cy="42" rx="2.5" ry="3.5" fill="#212121"/>
+        <ellipse class="eye-r" cx="58" cy="42" rx="2.5" ry="3.5" fill="#212121"/>
+        <circle cx="50" cy="58" r="1.5" fill="#212121"/>
+        <path d="M 49,46 C 47,54 44,64 50,66 C 56,64 53,54 51,46 Z" fill="#e1f5fe" stroke="#4fc3f7" stroke-width="1.8"/>
+      </svg>`
     }
-    initCanvasSize();
+  ];
 
-    // Dữ liệu mảng pijama màu sắc & kiểu tóc học sinh
-    const pajamaSkins = [
-        { hair: '#5d4037', hairStyle: 'girls-pigtails', pjColor: '#f8bbd0', pjPattern: 'dots', patternColor: '#e91e63' }, // Nene - Minh Châu
-        { hair: '#111111', hairStyle: 'spiky', pjColor: '#e1f5fe', pjPattern: 'stripes', patternColor: '#0288d1' }, // Kazama - Hoàng Long
-        { hair: '#3e2723', hairStyle: 'bald-round', pjColor: '#fff9c4', pjPattern: 'dots', patternColor: '#f57c00' }, // Masao - Đức Phúc
-        { hair: '#1a237e', hairStyle: 'bob', pjColor: '#b2dfdb', pjPattern: 'squares', patternColor: '#00796b' }  // Bo-chan - Gia Hân
-    ];
+  /* Âm thanh hoạt hình Web Audio API */
+  function playAudioEffect(type) {
+    if (!soundEnabled) return;
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (type === 'fart') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(35, audioCtx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.65);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.65);
+      } else if (type === 'faint') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+      }
+    } catch(e){}
+  }
 
-    // Tạo âm thanh giả lập bằng Web Audio API
-    function playSfx(type) {
-        if (!audioEnabled) return;
-        try {
-            const actx = new (window.AudioContext || window.webkitAudioContext)();
-            if (type === 'fart') {
-                const osc = actx.createOscillator();
-                const gain = actx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, actx.currentTime);
-                osc.frequency.linearRampToValueAtTime(25, actx.currentTime + 0.65);
-                gain.gain.setValueAtTime(0.6, actx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.7);
-                osc.connect(gain);
-                gain.connect(actx.destination);
-                osc.start();
-                osc.stop(actx.currentTime + 0.7);
-            } else if (type === 'faint') {
-                const osc = actx.createOscillator();
-                const gain = actx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(350, actx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(70, actx.currentTime + 0.5);
-                gain.gain.setValueAtTime(0.3, actx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.5);
-                osc.connect(gain);
-                gain.connect(actx.destination);
-                osc.start();
-                osc.stop(actx.currentTime + 0.5);
-            }
-        } catch (e) {}
+  function toggleAudio() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('btn-sound').innerText = soundEnabled ? '🔊' : '🔇';
+  }
+
+  /* Khói rắm độc màu xanh bay mù mịt */
+  let smokeParticles = [];
+  class Smoke {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.8) * 6;
+      this.vy = (Math.random() - 0.5) * 4;
+      this.size = Math.random() * 25 + 20;
+      this.alpha = 0.85;
+      this.color = Math.random() > 0.5 ? 'rgba(118, 186, 0, ' : 'rgba(167, 219, 78, ';
     }
-
-    function switchAudio() {
-        audioEnabled = !audioEnabled;
-        document.getElementById('sound-icon').innerText = audioEnabled ? '🔊' : '🔇';
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.size += 0.8;
+      this.alpha -= 0.012;
     }
-
-    // Class quản lý các hạt khói rắm
-    let smokeArray = [];
-    class SmokeParticle {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.vx = (Math.random() - 0.7) * 5 - 2; // Bay mạnh về bên trái
-            this.vy = (Math.random() - 0.5) * 3;
-            this.size = Math.random() * 20 + 15;
-            this.alpha = 0.85;
-            this.growth = 0.6;
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.size += this.growth;
-            this.alpha -= 0.012;
-        }
-        draw() {
-            ctx.fillStyle = `rgba(130, 201, 80, ${this.alpha})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
+    draw() {
+      ctx.fillStyle = this.color + this.alpha + ')';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
     }
+  }
 
-    // HỒNG HOẠT CHỮ TRUYỆN TRANH "BỤP! XỲYYY!"
-    let comicTexts = [];
-    class ComicText {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.scale = 0.4;
-            this.alpha = 1;
-            this.rotate = -15 * Math.PI / 180;
-        }
-        update() {
-            if (this.scale < 1.1) this.scale += 0.08;
-            this.y -= 1;
-            this.alpha -= 0.015;
-        }
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotate);
-            ctx.scale(this.scale, this.scale);
-            ctx.font = "900 36px 'Mali', sans-serif";
-            
-            // Vẽ bóng chữ cho xịn sò
-            ctx.fillStyle = "#1b4332";
-            ctx.fillText("BỤP! XỲYYY! 💨🤢", 4, 4);
-
-            ctx.fillStyle = "#38b000";
-            ctx.strokeStyle = "#ffffff";
-            ctx.lineWidth = 6;
-            ctx.strokeText("BỤP! XỲYYY! 💨🤢", 0, 0);
-            ctx.fillText("BỤP! XỲYYY! 💨🤢", 0, 0);
-            ctx.restore();
-        }
+  function renderSmokeLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = smokeParticles.length - 1; i >= 0; i--) {
+      smokeParticles[i].update();
+      if (smokeParticles[i].alpha <= 0) {
+        smokeParticles.splice(i, 1);
+      } else {
+        smokeParticles[i].draw();
+      }
     }
+    requestAnimationFrame(renderSmokeLoop);
+  }
+  requestAnimationFrame(renderSmokeLoop);
 
-    // NHÂN VẬT SHIN CẬU BÉ BÚT CHÌ ĐA TRẠNG THÁI
-    const shin = {
-        x: 640,
-        y: 350,
-        width: 120,
-        height: 140,
-        frame: 0,
-        fartProgress: 0, // Dùng để quản lý từng giây phút tuột quần xì hơi
-        
-        draw(bobbing) {
-            ctx.save();
-            ctx.translate(this.x, this.y + (state === 'peaceful' ? bobbing : 0));
+  /* Hoạt động di chuyển hỗn loạn của các bạn */
+  let moveInterval = null;
+  function startRunningChaos() {
+    if (moveInterval) clearInterval(moveInterval);
+    moveInterval = setInterval(() => {
+      const activeKids = document.querySelectorAll('.student-item.running');
+      activeKids.forEach(kid => {
+        let curLeft = parseFloat(kid.style.left);
+        let curBottom = parseFloat(kid.style.bottom);
 
-            if (state === 'peaceful') {
-                // PHASE 1: ÔN HÒA (Đứng thẳng, nhai đĩa bánh)
-                // Chân
-                ctx.fillStyle = '#fbc02d'; // tất vàng
-                ctx.strokeStyle = '#3e2723';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath(); ctx.ellipse(35, 128, 12, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(65, 128, 12, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        let dx = (Math.random() - 0.5) * 160;
+        let dy = (Math.random() - 0.5) * 70;
 
-                // Quần dài xanh
-                ctx.fillStyle = '#2196f3';
-                ctx.beginPath(); ctx.roundRect(22, 98, 56, 26, 10); ctx.fill(); ctx.stroke();
-                // Họa tiết pijama
-                ctx.fillStyle = '#ffeb3b';
-                ctx.beginPath(); ctx.arc(36, 110, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(64, 106, 3, 0, Math.PI*2); ctx.fill();
+        let newX = Math.max(30, Math.min(920, curLeft + dx));
+        let newY = Math.max(110, Math.min(270, curBottom + dy));
 
-                // Áo pijama xanh béo tròn
-                ctx.fillStyle = '#2196f3';
-                ctx.beginPath(); ctx.roundRect(18, 65, 64, 40, 12); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#ffeb3b';
-                ctx.beginPath(); ctx.arc(32, 78, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(60, 88, 4.5, 0, Math.PI*2); ctx.fill();
-
-                // Cánh tay đang cầm bánh ăn
-                ctx.strokeStyle = '#2196f3'; ctx.lineWidth = 14; ctx.lineCap = 'round';
-                ctx.beginPath(); ctx.moveTo(76, 85); ctx.lineTo(92, 85); ctx.stroke();
-                ctx.lineWidth = 2.5;
-
-                // Đĩa bánh
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.ellipse(98, 85, 14, 4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#6d4c41'; // Bánh gato
-                ctx.beginPath(); ctx.arc(98, 81, 6, 0, Math.PI*2); ctx.fill();
-
-                // Cánh tay đưa bánh lên miệng nhai nhai
-                ctx.strokeStyle = '#2196f3'; ctx.lineWidth = 12;
-                ctx.beginPath(); ctx.moveTo(35, 80); ctx.lineTo(26, 68); ctx.stroke();
-                ctx.lineWidth = 2.5;
-
-                // Đầu to đặc trưng, má phính Shin-chan quay sang trái nếm bánh
-                ctx.fillStyle = '#ffcc80';
-                ctx.beginPath(); ctx.ellipse(50, 42, 22, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(71, 44, 5, 7, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); // Tai
-
-                // Lông mày sâu róm rậm
-                ctx.fillStyle = '#000000';
-                ctx.beginPath(); ctx.roundRect(30, 31, 14, 5, 2); ctx.fill();
-                ctx.beginPath(); ctx.roundRect(54, 30, 14, 5, 2); ctx.fill();
-
-                // Mắt to tròn đang nheo híp vui nhai bánh
-                ctx.fillStyle = '#000000';
-                ctx.beginPath(); ctx.arc(38, 42, 2.5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(58, 41, 2.5, 0, Math.PI*2); ctx.fill();
-                // Miệng nhai hạnh phúc
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 2.5;
-                ctx.beginPath(); ctx.arc(46, 51, 4, 0, Math.PI, false); ctx.stroke();
-
-            } else {
-                // PHASE 2: THẢ RẮM (Cúi khom lưng, hai tay tụt quần dơ mông chổng ra trái)
-                // Hai chân dạt ra
-                ctx.fillStyle = '#fbc02d';
-                ctx.strokeStyle = '#3e2723';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath(); ctx.ellipse(25, 128, 11, 5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(75, 128, 12, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-
-                // Quần tụt pijama xanh để lộ mông
-                ctx.fillStyle = '#2196f3';
-                ctx.beginPath(); ctx.roundRect(35, 110, 52, 20, 8); ctx.fill(); ctx.stroke();
-
-                // BỜ MÔNG CHỔNG RA CHÂN THỰC y như mẫu, trêu ngươi
-                ctx.fillStyle = '#ffcc80';
-                // Vẽ mông tròn căng dính sát
-                ctx.beginPath(); ctx.arc(24, 112, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(40, 110, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                // Khe mông
-                ctx.strokeStyle = '#ff8a65'; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.moveTo(28, 120); ctx.quadraticCurveTo(30, 104, 32, 102); ctx.stroke();
-                ctx.lineWidth = 2.5;
-
-                // Thân khom nghiêng về phải
-                ctx.fillStyle = '#2196f3';
-                ctx.beginPath(); ctx.ellipse(60, 85, 34, 25, 20 * Math.PI / 180, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                // Họa tiết pijama
-                ctx.fillStyle = '#ffeb3b';
-                ctx.beginPath(); ctx.arc(50, 78, 4, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(74, 82, 3, 0, Math.PI*2); ctx.fill();
-
-                // Tay trái dơ bánh ra sau
-                ctx.strokeStyle = '#2196f3'; ctx.lineWidth = 11;
-                ctx.beginPath(); ctx.moveTo(76, 88); ctx.lineTo(95, 84); ctx.stroke();
-                ctx.lineWidth = 2.5;
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.ellipse(98, 83, 12, 3, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#6d4c41';
-                ctx.beginPath(); ctx.arc(98, 79, 5, 0, Math.PI*2); ctx.fill();
-
-                // Cánh tay kéo quần pijama (tuột quần thả rắm)
-                ctx.strokeStyle = '#2196f3'; ctx.lineWidth = 10;
-                ctx.beginPath(); ctx.moveTo(42, 90); ctx.quadraticCurveTo(46, 112, 38, 112); ctx.stroke();
-                ctx.lineWidth = 2.5;
-
-                // Đầu to tròn hướng nhìn về phía người chơi xem phản ứng ranh ma
-                ctx.fillStyle = '#ffcc80';
-                ctx.beginPath(); ctx.ellipse(54, 45, 24, 20, 10 * Math.PI / 180, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.ellipse(75, 48, 5, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); // Tai
-
-                // Lông mày rậm và mắt khép nhỏ nhe nhe tinh quái
-                ctx.fillStyle = '#000000';
-                ctx.beginPath(); ctx.roundRect(36, 34, 12, 5, 2); ctx.fill();
-                ctx.beginPath(); ctx.roundRect(58, 35, 12, 5, 2); ctx.fill();
-                
-                ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.moveTo(40, 48); ctx.lineTo(48, 46); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(60, 47); ctx.lineTo(66, 49); ctx.stroke();
-                ctx.lineWidth = 2.5;
-
-                // Nụ cười khoái chí chuẩn cậu bé Shin
-                ctx.beginPath(); ctx.arc(52, 56, 3, 0, Math.PI, false); ctx.stroke();
-            }
-
-            // Nhãn Tên màu vàng dẹt bo góc y mẫu
-            ctx.fillStyle = '#ffeb3b';
-            ctx.strokeStyle = '#4a2c11';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath(); ctx.roundRect(14, 134, 76, 20, 10); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = '#4a2c11';
-            ctx.font = 'bold 11px Comfortaa';
-            ctx.fillText("SHIN 🍮", 26, 148);
-
-            ctx.restore();
-        }
-    };
-
-    // CLASS QUẢN LÝ TẤT CẢ CÁC BẠN HỌC SINH PIJAMA CHUẨN ĐỒ HỌA
-    class Student {
-        constructor(name, index) {
-            this.name = name;
-            this.index = index;
-            this.skin = pajamaSkins[index % pajamaSkins.length];
-            
-            // Xếp vị trí ngẫu nhiên bên trái, tránh xa Shin
-            this.x = Math.random() * 480 + 50;
-            this.y = Math.random() * 150 + 290;
-            this.status = 'running'; // 'running' hoặc 'fainted'
-            this.faintTimer = 0; // Hiệu ứng xoắn ốc chuyển động
-
-            // Các vector chuyển động
-            this.targetX = this.x;
-            this.targetY = this.y;
-            this.moveSpeed = Math.random() * 2 + 3;
-            this.animTimer = Math.random() * 50;
-            this.shoutTimer = 0;
-            this.shoutVisible = false;
+        if (newX > 560 && newX < 740) {
+          newX = newX > 650 ? 760 : 530;
         }
 
-        update() {
-            if (this.status === 'running') {
-                this.animTimer += 0.2;
+        kid.style.left = `${newX}px`;
+        kid.style.bottom = `${newY}px`;
 
-                // Di chuyển ngẫu nhiên dồn dập nếu có sự kiện xì hơi
-                if (state === 'farting') {
-                    this.moveSpeed = 6.5; // Chạy nhanh hơn hoảng loạn
-                    if (Math.abs(this.x - this.targetX) < 10 && Math.abs(this.y - this.targetY) < 10) {
-                        this.targetX = Math.random() * 450 + 40;
-                        this.targetY = Math.random() * 130 + 280;
-                    }
-
-                    // Thỉnh thoảng kêu la "CHẠY MAU!"
-                    if (Math.random() > 0.98 && this.shoutTimer <= 0) {
-                        this.shoutVisible = true;
-                        this.shoutTimer = 45;
-                    }
-                } else {
-                    this.moveSpeed = 1.2; // Đi chậm ôn hòa nhảy nhảy nhót nhót
-                    if (Math.abs(this.x - this.targetX) < 5 && Math.abs(this.y - this.targetY) < 5) {
-                        this.targetX = this.x + (Math.random() - 0.5) * 50;
-                        this.targetY = this.y + (Math.random() - 0.5) * 30;
-                        // Giới hạn trong căn phòng
-                        this.targetX = Math.max(40, Math.min(550, this.targetX));
-                        this.targetY = Math.max(280, Math.min(420, this.targetY));
-                    }
-                }
-
-                // Di chuyển mượt mà tới mục tiêu
-                const dx = this.targetX - this.x;
-                const dy = this.targetY - this.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > 1) {
-                    this.x += (dx / dist) * this.moveSpeed;
-                    this.y += (dy / dist) * this.moveSpeed;
-                }
-
-                if (this.shoutTimer > 0) {
-                    this.shoutTimer--;
-                    if (this.shoutTimer <= 0) this.shoutVisible = false;
-                }
-
-            } else if (this.status === 'fainted') {
-                this.faintTimer += 0.12; // Tốc độ xoay mắt xoắn ốc @@
-            }
+        const bubble = kid.querySelector('.chat-bubble');
+        if (Math.random() > 0.65) {
+          bubble.innerText = '🏃‍♂️ CHẠY MAU!';
+          bubble.style.display = 'block';
+          setTimeout(() => {
+            if (kid.classList.contains('running')) bubble.style.display = 'none';
+          }, 1200);
         }
+      });
+    }, 1100);
+  }
 
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
+  /* THẢ RẤM SHIN & BẮT HỌC SINH */
+  function triggerFartEvent() {
+    playAudioEffect('fart');
 
-            // NẾU BỊ NGẤT XỈU THÌ XOAY NGƯỜI NẰM NGỬA RA ĐẤT (Y HỆT PHẢN ỨNG MẪU)
-            if (this.status === 'fainted') {
-                ctx.rotate(85 * Math.PI / 180);
-                ctx.translate(-40, -10);
-            }
+    // Shin chuyển sang tư thế tụt quần xì hơi & rung lắc
+    const shin = document.getElementById('shin-boy');
+    document.getElementById('shin-stand').style.display = 'none';
+    document.getElementById('shin-fart').style.display = 'block';
+    shin.classList.add('shin-farting');
 
-            // Tính hiệu ứng di chuyển dập dềnh chạy nhảy
-            const walkCycle = this.status === 'running' ? Math.sin(this.animTimer) * 6 : 0;
-            const tilt = this.status === 'running' ? Math.sin(this.animTimer) * 0.08 : 0;
+    // Chữ truyện tranh BỤP! XỲYYY!
+    const comicText = document.createElement('div');
+    comicText.className = 'fart-comic-text';
+    comicText.innerText = 'BỤP! XỲYYY! 💨';
+    roomStage.appendChild(comicText);
+    setTimeout(() => comicText.remove(), 850);
 
-            ctx.translate(40, 50);
-            ctx.rotate(tilt);
-            ctx.translate(-40, -50);
-
-            // 1. Chân & Tất pijama
-            ctx.fillStyle = this.skin.pjColor;
-            ctx.strokeStyle = '#333333';
-            ctx.lineWidth = 2.2;
-            const leftLegY = 85 + (this.status === 'running' ? Math.sin(this.animTimer * 1.5) * 4 : 0);
-            const rightLegY = 85 + (this.status === 'running' ? Math.cos(this.animTimer * 1.5) * 4 : 0);
-            
-            ctx.beginPath(); ctx.roundRect(16, leftLegY, 14, 12, 4); ctx.fill(); ctx.stroke();
-            ctx.beginPath(); ctx.roundRect(50, rightLegY, 14, 12, 4); ctx.fill(); ctx.stroke();
-
-            // 2. Toàn thân pijama
-            ctx.beginPath(); ctx.roundRect(14, 50, 52, 40, 10); ctx.fill(); ctx.stroke();
-            // Hoạ tiết áo pijama đặc trưng (Chấm bi hoặc kẻ ô, stripes)
-            ctx.fillStyle = this.skin.patternColor;
-            if (this.skin.pjPattern === 'dots') {
-                ctx.beginPath(); ctx.arc(26, 60, 3.5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(52, 64, 3, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(38, 76, 3.5, 0, Math.PI*2); ctx.fill();
-            } else {
-                ctx.strokeStyle = this.skin.patternColor; ctx.lineWidth = 2.5;
-                ctx.beginPath(); ctx.moveTo(22, 54); ctx.lineTo(22, 86); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(42, 52); ctx.lineTo(42, 88); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(56, 54); ctx.lineTo(56, 86); ctx.stroke();
-                ctx.lineWidth = 2.2;
-            }
-
-            // 3. Cánh tay dơ lên khi chạy nhảy / ăn bánh
-            ctx.strokeStyle = this.skin.pjColor; ctx.lineWidth = 10; ctx.lineCap = 'round';
-            if (state === 'peaceful' && this.status === 'running') {
-                // Cầm đồ ăn
-                ctx.beginPath(); ctx.moveTo(64, 66); ctx.lineTo(76, 62); ctx.stroke();
-                ctx.lineWidth = 2.2;
-                ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.arc(78, 60, 4, 0, Math.PI*2); ctx.fill();
-            } else {
-                // Đơ hoảng loạn giơ cao
-                ctx.beginPath(); ctx.moveTo(8, 56); ctx.lineTo(-4, 45 + walkCycle); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(70, 58); ctx.lineTo(82, 47 - walkCycle); ctx.stroke();
-                ctx.lineWidth = 2.2;
-            }
-
-            // 4. Đầu hoạt hình chuẩn phong cách Shin
-            ctx.fillStyle = '#ffcc80';
-            ctx.beginPath(); ctx.ellipse(40, 26, 21, 18, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-
-            // 5. Tóc nhiều kiểu pijama của Shin-chan & Nene & Masao
-            ctx.fillStyle = this.skin.hair;
-            if (this.skin.hairStyle === 'girls-pigtails') {
-                // Búi tóc 2 bên
-                ctx.beginPath(); ctx.arc(14, 18, 7, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(66, 18, 7, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                ctx.beginPath(); ctx.arc(40, 14, 19, Math.PI, 0, false); ctx.fill(); ctx.stroke();
-            } else if (this.skin.hairStyle === 'spiky') {
-                ctx.beginPath(); ctx.moveTo(18, 18); ctx.lineTo(40, 4); ctx.lineTo(62, 18); ctx.closePath(); ctx.fill(); ctx.stroke();
-            } else {
-                ctx.beginPath(); ctx.arc(40, 16, 20, Math.PI, 0, false); ctx.fill(); ctx.stroke();
-            }
-
-            // 6. Khuôn mặt mắt thôi miên (Khi ngất xỉu) hoặc nhắm mở híp (khi sống)
-            if (this.status === 'fainted') {
-                // HIỆU ỨNG THÔI MIÊN VÒNG XOÁN ỐC XOAY TRÒN (Y HỆT VIDEO GỐC)
-                ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
-                
-                // Mắt xoắn Trái
-                ctx.save();
-                ctx.translate(28, 28);
-                ctx.rotate(this.faintTimer);
-                ctx.beginPath();
-                for (let a = 0; a < 14; a++) {
-                    let r = a * 0.7;
-                    let th = a * 0.55;
-                    ctx.lineTo(r * Math.cos(th), r * Math.sin(th));
-                }
-                ctx.stroke();
-                ctx.restore();
-
-                // Mắt xoắn Phải
-                ctx.save();
-                ctx.translate(52, 28);
-                ctx.rotate(this.faintTimer);
-                ctx.beginPath();
-                for (let a = 0; a < 14; a++) {
-                    let r = a * 0.7;
-                    let th = a * 0.55;
-                    ctx.lineTo(r * Math.cos(th), r * Math.sin(th));
-                }
-                ctx.stroke();
-                ctx.restore();
-
-                // Miệng "O" ngỡ ngàng
-                ctx.fillStyle = '#d81b60';
-                ctx.beginPath(); ctx.arc(40, 36, 4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-
-            } else {
-                // Khi đang hoạt động - hoảng hốt hoặc vui vẻ ăn uống
-                ctx.fillStyle = '#000000';
-                if (state === 'farting') {
-                    // Mắt chữ A chữ O hoảng hốt chạy trốn
-                    ctx.beginPath(); ctx.arc(28, 28, 3, 0, Math.PI*2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(52, 28, 3, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#d81b60';
-                    ctx.beginPath(); ctx.arc(40, 38, 4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                } else {
-                    // Trạng thái từ tốn ăn uống thảnh thơi
-                    ctx.beginPath(); ctx.ellipse(28, 28, 3, 2, 0, 0, Math.PI*2); ctx.fill();
-                    ctx.beginPath(); ctx.ellipse(52, 28, 3, 2, 0, 0, Math.PI*2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(40, 34, 3, 0, Math.PI); ctx.stroke();
-                }
-            }
-
-            ctx.restore();
-
-            // 7. Bóng thoại thông báo "CHẠY MAU" hoặc "NGẤT XỈU THÚI QUÁ"
-            if (this.status === 'fainted') {
-                this.drawSpeechBubble("Thúi quá... ngất! 😵");
-            } else if (this.shoutVisible) {
-                this.drawSpeechBubble("🏃‍♂️ CHẠY MAU!");
-            }
-
-            // 8. Tên nhãn của từng bé pijama
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.fillStyle = this.status === 'fainted' ? '#ffdada' : '#ffffff';
-            ctx.strokeStyle = this.status === 'fainted' ? '#aa0000' : '#4a3427';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath(); ctx.roundRect(5, 95, 70, 18, 9); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = this.status === 'fainted' ? '#aa0000' : '#333333';
-            ctx.font = 'bold 10px Comfortaa';
-            ctx.textAlign = 'center';
-            ctx.fillText(this.name, 40, 108);
-            ctx.restore();
-        }
-
-        drawSpeechBubble(text) {
-            ctx.save();
-            ctx.translate(this.x + 40, this.y - 12);
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = '#222222';
-            ctx.lineWidth = 2.2;
-            
-            ctx.font = 'bold 9px Comfortaa';
-            const width = ctx.measureText(text).width + 12;
-
-            ctx.beginPath();
-            ctx.roundRect(-width/2, -15, width, 18, 7);
-            ctx.fill(); ctx.stroke();
-
-            // Trỏ của bóng thoại
-            ctx.beginPath();
-            ctx.moveTo(-4, 3); ctx.lineTo(0, 9); ctx.lineTo(4, 3);
-            ctx.fill(); ctx.stroke();
-
-            ctx.fillStyle = '#000000';
-            ctx.textAlign = 'center';
-            ctx.fillText(text, 0, -3);
-            ctx.restore();
-        }
+    // Phun khói từ mông
+    for (let i = 0; i < 45; i++) {
+      setTimeout(() => {
+        smokeParticles.push(new Smoke(640, 460));
+      }, i * 10);
     }
 
-    let allStudents = [];
+    banner.innerText = '🏃‍♂️ CHẠY MAU! CÁC BẠN ĐANG CHẠY TRỐN KHẮP PHÒNG!';
+    banner.style.background = '#ffd166';
+    mainBtn.innerText = '🤢 ĐANG CHẠY TRỐN... (THẢ TIẾP!) 💨';
 
-    // GỌI PHÉP THẢ RẤM SHIN TỪ TỐN SANG ĐỢT PHUN KHÓI MÙ MỊT
-    function startFart() {
-        if (state === 'farting') return; // Không click dồn dập
-        
-        state = 'farting';
-        playSfx('fart');
+    const activeKids = Array.from(document.querySelectorAll('.student-item.running'));
+    if (activeKids.length === 0) {
+      alert("Tất cả đã ngất xỉu rồi! Hãy nhấn 'Gọi lại từ đầu' nhé!");
+      return;
+    }
 
-        // Bùng chữ truyện tranh rung bần bật
-        comicTexts.push(new ComicText(610, 310));
+    const numToFaint = parseInt(document.getElementById('faint-range').value);
+    const chosenKids = activeKids.sort(() => 0.5 - Math.random()).slice(0, numToFaint);
 
-        // Phun mịt khói cuộn trào từ vị trí mông dở pijama của Shin
-        for (let i = 0; i < 48; i++) {
-            setTimeout(() => {
-                if (state === 'farting') {
-                    smokeArray.push(new SmokeParticle(635, 460));
-                }
-            }, i * 11);
+    chosenKids.forEach((kid, idx) => {
+      setTimeout(() => {
+        kid.classList.remove('running');
+        kid.classList.add('fainted');
+
+        // Mắt xoắn ốc thôi miên
+        const tplIdx = parseInt(kid.getAttribute('data-tpl'));
+        const tpl = studentTemplates[tplIdx];
+        const eyeL = kid.querySelector('.eye-l');
+        const eyeR = kid.querySelector('.eye-r');
+
+        if (eyeL && eyeR) {
+          const hypnoSvg = `
+            <g class="hypno-eye">
+              <circle cx="0" cy="0" r="5" fill="none" stroke="#222" stroke-width="1.8"/>
+              <path d="M 0,0 Q 2,-3 4,0 Q 2,3 0,0" stroke="#222" stroke-width="1.5" fill="none"/>
+            </g>
+          `;
+          eyeL.outerHTML = `<g transform="translate(${tpl.eyeLPos.x}, ${tpl.eyeLPos.y})">${hypnoSvg}</g>`;
+          eyeR.outerHTML = `<g transform="translate(${tpl.eyeRPos.x}, ${tpl.eyeRPos.y})">${hypnoSvg}</g>`;
         }
 
-        // Thay banner và hành vi nút
-        alertBanner.innerText = '🏃‍♂️ CHẠY MAU! CÁC BẠN ĐANG CHẠY TRỐN KHẮP PHÒNG!';
-        alertBanner.style.background = '#ffccd5';
-        alertBanner.style.color = '#7209b7';
-        actBtn.innerText = 'ĐANG CHẠY TRỐN...';
+        const bubble = kid.querySelector('.chat-bubble');
+        bubble.innerText = '😵 Thúi quá... ngất!';
+        bubble.style.display = 'block';
 
-        // Sau 1 giây hỗn loạn chạy trốn sẽ bắt và làm ngất học sinh dính đòn
-        setTimeout(() => {
-            faintRandomStudents();
-        }, 1100);
-    }
+        playAudioEffect('faint');
+        updateCounters();
+      }, idx * 400);
+    });
+  }
 
-    function faintRandomStudents() {
-        const activeList = allStudents.filter(s => s.status === 'running');
-        if (activeList.length === 0) {
-            alert("Tất cả đã ngất lịm vì quá thối! Nhấn nút 'Gọi lại từ đầu' nhé!");
-            state = 'peaceful';
-            actBtn.innerText = '🧁 SHIN XÌ HƠI! 🤢';
-            return;
-        }
+  function updateCounters() {
+    const playing = document.querySelectorAll('.student-item.running').length;
+    const fainted = document.querySelectorAll('.student-item.fainted').length;
+    document.getElementById('count-playing').innerText = playing;
+    document.getElementById('count-fainted').innerText = fainted;
+  }
 
-        const countToFaint = parseInt(document.getElementById('faint-slider').value);
-        let actual = Math.min(countToFaint, activeList.length);
+  /* Khởi tạo học sinh */
+  function initializeStudents() {
+    const existing = document.querySelectorAll('.student-item');
+    existing.forEach(e => e.remove());
 
-        // Chọn ngẫu nhiên
-        const chosen = activeList.sort(() => 0.5 - Math.random()).slice(0, actual);
+    const namesInput = document.getElementById('student-names-input').value;
+    students = namesInput.split('\n').filter(n => n.trim() !== '');
 
-        chosen.forEach((st, i) => {
-            setTimeout(() => {
-                st.status = 'fainted';
-                playSfx('faint');
-                updateBadges();
-            }, i * 400);
-        });
+    students.forEach((name, i) => {
+      const kid = document.createElement('div');
+      kid.className = 'student-item running';
+      kid.id = `kid-${i}`;
+      
+      const tplIdx = i % studentTemplates.length;
+      kid.setAttribute('data-tpl', tplIdx);
+      const tpl = studentTemplates[tplIdx];
 
-        // Chờ các bạn ngất xong sẽ đưa Shin về lại trạng thái ôn hòa tiếp tục ăn bánh
-        setTimeout(() => {
-            state = 'peaceful';
-            alertBanner.innerText = '🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!';
-            alertBanner.style.background = '#e2f7cb';
-            alertBanner.style.color = '#2b540f';
-            actBtn.innerText = '🧁 SHIN XÌ HƠI! 🤢';
-        }, actual * 400 + 800);
-    }
+      kid.innerHTML = `
+        <div class="chat-bubble" style="display:none;"></div>
+        ${tpl.svg}
+        <div class="student-tag">${name}</div>
+      `;
 
-    function updateBadges() {
-        const p = allStudents.filter(s => s.status === 'running').length;
-        const f = allStudents.filter(s => s.status === 'fainted').length;
-        document.getElementById('playing-cnt').innerText = p;
-        document.getElementById('fainted-cnt').innerText = f;
-    }
+      let startX, startY;
+      do {
+        startX = Math.random() * 860 + 40;
+        startY = Math.random() * 150 + 110;
+      } while (startX > 560 && startX < 740);
 
-    // TẢI & RESET GAME
-    function initStudents() {
-        const names = document.getElementById('names-input').value
-            .split('\n')
-            .filter(n => n.trim() !== "");
+      kid.style.left = `${startX}px`;
+      kid.style.bottom = `${startY}px`;
 
-        allStudents = names.map((n, i) => new Student(n, i));
-        updateBadges();
-    }
+      roomStage.appendChild(kid);
+    });
 
-    function resetAll() {
-        state = 'peaceful';
-        alertBanner.innerText = '🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!';
-        alertBanner.style.background = '#e2f7cb';
-        alertBanner.style.color = '#2b540f';
-        actBtn.innerText = '🧁 SHIN XÌ HƠI! 🤢';
-        smokeArray = [];
-        comicTexts = [];
-        initStudents();
-    }
+    updateCounters();
+    startRunningChaos();
+  }
 
-    function togglePopup(show) {
-        document.getElementById('popup').style.display = show ? 'flex' : 'none';
-    }
+  function resetGameStage() {
+    banner.innerText = '🍰 Các bạn đang thưởng thức bánh ngọt tại tiệc ngủ!';
+    banner.style.background = '#fff8bd';
+    mainBtn.innerText = '💨 SHIN XÌ HƠI! 🤢';
+    document.getElementById('shin-stand').style.display = 'block';
+    document.getElementById('shin-fart').style.display = 'none';
+    initializeStudents();
+  }
 
-    function saveNames() {
-        togglePopup(false);
-        resetAll();
-    }
+  function openStudentModal() {
+    document.getElementById('name-modal').style.display = 'flex';
+  }
 
-    // VÒNG LẶP HOẠT HÌNH FRAME CHUYỂN ĐỘNG TRƠN TRU (GAME LOOP)
-    let globalTimer = 0;
-    function loop() {
-        globalTimer += 0.05;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function saveStudentNames() {
+    document.getElementById('name-modal').style.display = 'none';
+    resetGameStage();
+  }
 
-        // Độ nhấp nhô nhảy nhẹ pijama pijama khi đứng yên
-        const bob = Math.sin(globalTimer) * 4;
-
-        // Vẽ mây khói, chữ comic lên trên
-        for (let i = smokeArray.length - 1; i >= 0; i--) {
-            smokeArray[i].update();
-            if (smokeArray[i].alpha <= 0) {
-                smokeArray.splice(i, 1);
-            } else {
-                smokeArray[i].draw();
-            }
-        }
-
-        // Vẽ các học sinh
-        allStudents.forEach(st => {
-            st.update();
-            st.draw();
-        });
-
-        // Vẽ cậu bé Shin
-        shin.draw(bob);
-
-        // Hiển thị chữ truyện tranh nổ rực rỡ
-        for (let i = comicTexts.length - 1; i >= 0; i--) {
-            comicTexts[i].update();
-            if (comicTexts[i].alpha <= 0) {
-                comicTexts.splice(i, 1);
-            } else {
-                comicTexts[i].draw();
-            }
-        }
-
-        requestAnimationFrame(loop);
-    }
-
-    // Bắt đầu
-    initStudents();
-    requestAnimationFrame(loop);
+  window.onload = () => {
+    initializeStudents();
+  };
 </script>
 
 </body>
